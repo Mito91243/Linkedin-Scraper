@@ -1,68 +1,51 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+# LinkedIn Scraper
+
 <a id="readme-top"></a>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
 
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/Mito91243/Linkedin-Scraper">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
+  </a>
 
+  <h3 align="center">LinkedIn Scraper</h3>
 
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
-
+  <p align="center">
+    An efficient tool to streamline your job search and networking on LinkedIn!
+    <br />
+    <a href="https://github.com/Mito91243/Linkedin-Scraper"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/Mito91243/Linkedin-Scraper">View Demo</a>
+    ·
+    <a href="https://github.com/Mito91243/Linkedin-Scraper/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/Mito91243/Linkedin-Scraper/issues">Request Feature</a>
+  </p>
+</div>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]]
+[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
+LinkedIn Scraper is a powerful tool designed to help you efficiently search for and connect with professionals on LinkedIn. By automating the process of finding relevant contacts, it saves you valuable time in your job search or networking efforts.
 
-Here's why:
-* Your time should be focused on applying to Jobs. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like searching for people to reach out to
-* Just Write the Company's name in your CLI and get the top candidates to connect with
+Here's why LinkedIn Scraper is awesome:
+* Your time should be focused on applying to jobs and making meaningful connections, not on manual searches
+* It eliminates the repetitive task of searching for people to reach out to
+* Simply enter a company name in the CLI and get a list of top candidates to connect with
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
+To get LinkedIn Scraper up and running on your local machine, follow these simple steps.
 
 ### Installation
-
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
 
 1. Clone the repo
    ```sh
    git clone https://github.com/Mito91243/Linkedin-Scraper.git
-   ```
-2. Go to main Folder
-   ```sh
-   Go Mod tidy
-   ```
-3. Enter your Csrf-Token in `.env`
-   ```js
-   csrf = 'ajax:----------';
-   ```
-4.  Enter your Cookie in `.env`
-   ```js
-   cookie = 'cookie';
-   ```
-
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
