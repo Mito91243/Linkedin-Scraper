@@ -5,7 +5,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/Mito91243/Linkedin-Scraper">
+  <a href="https://github.com/Mito91243/Linkedin-Scraper/images/First View.png">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -13,15 +13,6 @@
 
   <p align="center">
     An efficient tool to streamline your job search and networking on LinkedIn!
-    <br />
-    <a href="https://github.com/Mito91243/Linkedin-Scraper"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/Mito91243/Linkedin-Scraper">View Demo</a>
-    ·
-    <a href="https://github.com/Mito91243/Linkedin-Scraper/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/Mito91243/Linkedin-Scraper/issues">Request Feature</a>
   </p>
 </div>
 
