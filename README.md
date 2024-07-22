@@ -5,10 +5,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/Mito91243/Linkedin-Scraper/images/First View.png">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
-
+    <img src="images/First View.png" alt="Logo" width="80" height="80">
   <h3 align="center">LinkedIn Scraper</h3>
 
   <p align="center">
