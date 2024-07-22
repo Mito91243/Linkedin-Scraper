@@ -42,5 +42,5 @@ func main() {
 
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
 	fmt.Println(strings.Repeat("=", 60))
-	//fmt.Scanln()
+	fmt.Scanln()
 }
