@@ -45,7 +45,8 @@ To get LinkedIn Scraper up and running on your local machine, follow these simpl
     ```
 4. Put credentials in the .env file
    ```sh
-   git clone https://github.com/Mito91243/Linkedin-Scraper.git
+   cookie = "YOUR_COOKIE"
+   csrf = "YOUR_CSRF_TOKEN"
     ```
 5. Run the Program
    ```sh
