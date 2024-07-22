@@ -23,7 +23,6 @@ Here's why LinkedIn Scraper is awesome:
 * It eliminates the repetitive task of searching for people to reach out to
 * Simply enter a company name in the CLI and get a list of top candidates to connect with
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -36,19 +35,23 @@ To get LinkedIn Scraper up and running on your local machine, follow these simpl
    ```sh
    git clone https://github.com/Mito91243/Linkedin-Scraper.git
     ```
-1. Go to main folder
+2. Go to main folder
+   ```sh
+   cd .\main\
+    ```
+3. Download Dependencies
+   ```sh
+   go mod tidy
+    ```
+4. Put credentials in the .env file
    ```sh
    git clone https://github.com/Mito91243/Linkedin-Scraper.git
     ```
-1. Download Dependencies
+5. Run the Program
    ```sh
-   git clone https://github.com/Mito91243/Linkedin-Scraper.git
+   go run .
     ```
-1. Put credentials in the .env file
-   ```sh
-   git clone https://github.com/Mito91243/Linkedin-Scraper.git
-    ```
-
+   
 <!-- USAGE EXAMPLES -->
 ## Usage
 
