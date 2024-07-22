@@ -60,14 +60,14 @@ LinkedIn Scraper is easy to use. Here's a quick guide to get you started:
 1. **Run the program and enter the company name you're interested in:**
 2. **Choose the position you want to scrape:**
 
-   ![Usage Step 2][usage-screenshot-2]
+  ![Second View](https://github.com/user-attachments/assets/4c2a66eb-e13a-43e0-973f-ef0a44b7490c)
 
 3. **The program will fetch and display relevant profiles:**
 
-   ![Usage Step 3][usage-screenshot-3]
+  ![Results View](https://github.com/user-attachments/assets/60a529a4-8731-4475-a651-1ab15ed1f4a1)
 
 ### Setting up Environment Variables
-   ![Usage Step 3][usage-screenshot-4]
+  ![env](https://github.com/user-attachments/assets/3efb32fd-812c-4b09-a6b4-a1913c08827d)
 To use LinkedIn Scraper, you need to provide your LinkedIn CSRF token and cookie. Here's how to get them:
 
 1. **Log in to LinkedIn in your web browser.**
@@ -77,16 +77,9 @@ To use LinkedIn Scraper, you need to provide your LinkedIn CSRF token and cookie
 5. **In the request headers**, find the 'csrf-token' and 'cookie' values:
 6. **If you are facing trouble just export it to postman**, and then get the headers from the autocode generator innit
 
-   ![Network Tab][network-screenshot]
+   ![Network Tab](https://github.com/user-attachments/assets/66a1f6e8-abb3-4ef3-a01a-1d91b7f58752)
 
 7. **Create a `.env` file in the main folder** and add these values:
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- MARKDOWN LINKS & IMAGES -->
-[usage-screenshot-2]: images/Second View.png
-[usage-screenshot-3]: images/Results View.png
-[usage-screenshot-4]: images/env.png
-[network-screenshot]: images/Network Tab.png
-
