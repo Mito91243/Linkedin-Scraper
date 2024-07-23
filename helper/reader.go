@@ -118,7 +118,7 @@ func ReadPositionInput() string {
 			}
 		}
 		color.Set(color.FgWhite)
-		fmt.Print("Enter your choice (1-3): ")
+		fmt.Print("Enter your choice (1-5): ")
 		color.Unset()
 	}
 	return "12"
