@@ -1,39 +1,44 @@
-package helperFunction
+package server
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
+	"main/internal/utils"
+	"main/internal/api"
+	"main/internal/models"
 	"net/http"
+	"os"
 	"strings"
 	"time"
+
 	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 	"github.com/olekukonko/tablewriter"
-	"os"
 )
 
 func Start() {
-	PrintHeader()
-	err := godotenv.Load()
+	utils.PrintHeader()
+	err := godotenv.Load("C:/Users/pitoa/Desktop/Projects/Linkedin FullStack/Backend/.env")
 	if err != nil {
+		fmt.Print(err)
 		fmt.Println("❌ Error loading .env file")
 		return
 	}
 
 	client := &http.Client{}
-	companyName := Read_input()
+	companyName := utils.Read_input()
 	companyEmail := companyName
-	if len(strings.Split(companyName,"-")) > 1 {
-		companyEmail = strings.Split(companyName,"-")[0]
+	if len(strings.Split(companyName, "-")) > 1 {
+		companyEmail = strings.Split(companyName, "-")[0]
 	}
 	start := time.Now()
 	companyIdchan := make(chan string)
 	positionIdchan := make(chan string)
 	go func() {
-		companyID, _ := Get_company_id(client, companyName)
+		companyID, _ := api.Get_company_id(client, companyName)
 		companyIdchan <- companyID
 	}()
 	go func() {
-		positionIdentifier := ReadPositionInput()
+		positionIdentifier := utils.ReadPositionInput()
 		positionIdchan <- positionIdentifier
 	}()
 	companyID := <-companyIdchan
@@ -42,8 +47,8 @@ func Start() {
 	// The id List(id) in here is the id of the country so change it depending on what country you want to scrape from . Here is USA for reference : 103644278
 	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:48)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
 
-	profiles := Run(companyEmail,url, client)
-	EncodeProfiles(profiles)
+	profiles := Run(companyEmail, url, client)
+	utils.EncodeProfiles(profiles)
 	fmt.Println(strings.Repeat("-", 60))
 
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
@@ -51,15 +56,15 @@ func Start() {
 	fmt.Scanln()
 }
 
-func Run(companyName string,url string, client *http.Client) []ProfileRes {
+func Run(companyName string, url string, client *http.Client) []models.ProfileRes {
 	start := time.Now()
-	body, status := Get_Req(url, client)
+	body, status := api.Get_Req(url, client)
 	if status != 200 {
 		color.Red("Error making GET request: %v", status)
 		return nil
 	}
 
-	results, err := ExtractProfiles(body)
+	results, err := utils.ExtractProfiles(body)
 	if err != nil {
 		color.Red("Error extracting profiles: %v", err)
 		return nil
@@ -81,16 +86,16 @@ func Run(companyName string,url string, client *http.Client) []ProfileRes {
 	table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
 	table.SetColWidth(50)
 
-	var profiles []ProfileRes
+	var profiles []models.ProfileRes
 	for i, profile := range results {
 		if _, ok := profile["position"]; !ok {
 			continue
 		}
-		temp_profile := ProfileRes{
-			FullName:   safeGetString(profile, "fullName"),
-			LastName:   safeGetString(profile, "lastName"),
-			Position:   safeGetString(profile, "position"),
-			ProfileURN: safeGetString(profile, "Possible Email"),
+		temp_profile := models.ProfileRes{
+			FullName:   utils.SafeGetString(profile, "fullName"),
+			LastName:   utils.SafeGetString(profile, "lastName"),
+			Position:   utils.SafeGetString(profile, "position"),
+			ProfileURN: utils.SafeGetString(profile, "Possible Email"),
 		}
 		emailFirst := strings.Split(temp_profile.FullName, " ")[0]
 		emailLast := strings.Split(temp_profile.FullName, " ")[len(strings.Split(temp_profile.FullName, " "))-1]
@@ -98,10 +103,10 @@ func Run(companyName string,url string, client *http.Client) []ProfileRes {
 
 		table.Append([]string{
 			fmt.Sprintf("Profile %d", i+1-len(results)/2),
-			truncateString(temp_profile.FullName, 20),
-			truncateString(temp_profile.LastName, 15),
-			truncateString(temp_profile.Position, 100),
-			truncateString(email, 40),
+			utils.TruncateString(temp_profile.FullName, 20),
+			utils.TruncateString(temp_profile.LastName, 15),
+			utils.TruncateString(temp_profile.Position, 100),
+			utils.TruncateString(email, 40),
 		})
 
 		profiles = append(profiles, temp_profile)

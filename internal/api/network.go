@@ -1,10 +1,10 @@
-package helperFunction
-
+package api
 import (
 	"fmt"
 	"net/http"
 	"os"
 	"regexp"
+	"main/internal/utils"
 )
 
 func Get_Req(url string, client *http.Client) ([]byte, int) {
@@ -37,7 +37,7 @@ func Get_Req(url string, client *http.Client) ([]byte, int) {
 	}
 	defer res.Body.Close()
 
-	body := Decoding(res)
+	body := utils.Decoding(res)
 	//fmt.Printf(string(body))
 	if res.StatusCode != 200 {
 		fmt.Printf("🌐 Connection Error With Status Code: %d\n", res.StatusCode)
@@ -64,9 +64,5 @@ func Get_company_id(client *http.Client, companyName string) (string, error) {
 	return companyID, nil
 }
 
-func truncateString(s string, maxLength int) string {
-	if len(s) > maxLength {
-		return s[:maxLength-3] + "..."
-	}
-	return s
-}
+
+
