@@ -2,13 +2,9 @@ package helperFunction
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/olekukonko/tablewriter"
 	"net/http"
 	"os"
 	"regexp"
-	"strings"
-	"time"
 )
 
 func Get_Req(url string, client *http.Client) ([]byte, int) {
@@ -66,68 +62,6 @@ func Get_company_id(client *http.Client, companyName string) (string, error) {
 	companyID := string(matches[1])
 
 	return companyID, nil
-}
-
-func Run(companyName string,url string, client *http.Client) []ProfileRes {
-	start := time.Now()
-	body, status := Get_Req(url, client)
-	if status != 200 {
-		color.Red("Error making GET request: %v", status)
-		return nil
-	}
-
-	results, err := ExtractProfiles(body)
-	if err != nil {
-		color.Red("Error extracting profiles: %v", err)
-		return nil
-	}
-
-	color.Cyan("\n🔍 Extracted Profiles:")
-
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Profile", "Full Name", "Last Name", "Position", "Profile URL"})
-	table.SetColumnColor(
-		tablewriter.Colors{tablewriter.FgHiGreenColor},
-		tablewriter.Colors{tablewriter.FgHiBlueColor},
-		tablewriter.Colors{tablewriter.FgBlueColor},
-		tablewriter.Colors{tablewriter.FgYellowColor},
-		tablewriter.Colors{tablewriter.FgMagentaColor},
-	)
-
-	table.SetAutoWrapText(false)
-	table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
-	table.SetColWidth(50)
-
-	var profiles []ProfileRes
-	for i, profile := range results {
-		if _, ok := profile["position"]; !ok {
-			continue
-		}
-		temp_profile := ProfileRes{
-			FullName:   safeGetString(profile, "fullName"),
-			LastName:   safeGetString(profile, "lastName"),
-			Position:   safeGetString(profile, "position"),
-			ProfileURN: safeGetString(profile, "Possible Email"),
-		}
-		emailFirst := strings.Split(temp_profile.FullName, " ")[0]
-		emailLast := strings.Split(temp_profile.FullName, " ")[len(strings.Split(temp_profile.FullName, " "))-1]
-		email := emailFirst + "." + emailLast + "@" + companyName + ".com"
-
-		table.Append([]string{
-			fmt.Sprintf("Profile %d", i+1-len(results)/2),
-			truncateString(temp_profile.FullName, 20),
-			truncateString(temp_profile.LastName, 15),
-			truncateString(temp_profile.Position, 100),
-			truncateString(email, 40),
-		})
-
-		profiles = append(profiles, temp_profile)
-	}
-
-	table.Render()
-
-	color.Yellow("\n✨ Time to fetch %d profiles: %.2f seconds\n", len(profiles), time.Since(start).Seconds())
-	return profiles
 }
 
 func truncateString(s string, maxLength int) string {
