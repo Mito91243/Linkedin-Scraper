@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-
+	"strings"
 	"time"
 )
 
@@ -68,7 +68,7 @@ func Get_company_id(client *http.Client, companyName string) (string, error) {
 	return companyID, nil
 }
 
-func Run(url string, client *http.Client) []ProfileRes {
+func Run(companyName string,url string, client *http.Client) []ProfileRes {
 	start := time.Now()
 	body, status := Get_Req(url, client)
 	if status != 200 {
@@ -107,15 +107,18 @@ func Run(url string, client *http.Client) []ProfileRes {
 			FullName:   safeGetString(profile, "fullName"),
 			LastName:   safeGetString(profile, "lastName"),
 			Position:   safeGetString(profile, "position"),
-			ProfileURN: safeGetString(profile, "entityUrn"),
+			ProfileURN: safeGetString(profile, "Possible Email"),
 		}
+		emailFirst := strings.Split(temp_profile.FullName, " ")[0]
+		emailLast := strings.Split(temp_profile.FullName, " ")[len(strings.Split(temp_profile.FullName, " "))-1]
+		email := emailFirst + "." + emailLast + "@" + companyName + ".com"
 
 		table.Append([]string{
-			fmt.Sprintf("Profile %d",i+1-len(results)/2),
+			fmt.Sprintf("Profile %d", i+1-len(results)/2),
 			truncateString(temp_profile.FullName, 20),
 			truncateString(temp_profile.LastName, 15),
 			truncateString(temp_profile.Position, 100),
-			truncateString(temp_profile.ProfileURN, 40),
+			truncateString(email, 40),
 		})
 
 		profiles = append(profiles, temp_profile)

@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func PrintHeader()  {
+func PrintHeader() {
 	color.Set(color.FgGreen)
 	fmt.Println("------------------------------------------------------------------------")
 	fmt.Println()
@@ -68,10 +68,13 @@ func ReadPositionInput() string {
 	fmt.Println("1️⃣  Human Resources")
 	fmt.Println("2️⃣  Engineers")
 	fmt.Println("3️⃣  Program Managers")
+	fmt.Println("4️⃣  Research")
+	fmt.Println("5️⃣  Information Technology")
+	
 	color.Set(color.FgCyan)
 	fmt.Println("============================================================")
 	color.Set(color.FgWhite)
-	fmt.Print("Enter your choice (1-3): ")
+	fmt.Print("Enter your choice (1-5): ")
 	color.Unset()
 
 	for scanner.Scan() {
@@ -97,6 +100,17 @@ func ReadPositionInput() string {
 				fmt.Println("📝 Fetching Program Managers...")
 				color.Unset()
 				return "18"
+			case "4":
+				color.Set(color.FgYellow)
+				fmt.Println("📝 Fetching Researchers...")
+				color.Unset()
+				return "24"
+			case "5":
+				color.Set(color.FgYellow)
+				fmt.Println("📝 Fetching IT personnel...")
+				color.Unset()
+				return "13"
+
 			default:
 				color.Set(color.FgRed)
 				fmt.Println("❌ Invalid input. Please enter 1, 2, or 3.")
