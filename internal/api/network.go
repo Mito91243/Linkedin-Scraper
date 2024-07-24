@@ -76,7 +76,7 @@ func GetCompanyName(client *http.Client, inputCompany string) string {
 
 	bodyString := string(bodyBytes)
 
-	matches := strings.Split(bodyString, "www.linkedin.com/company/")[1]
+	matches := strings.Split(bodyString, "company/")[1]
 	matches = strings.Split(matches, "&")[0]
 	//fmt.Printf("COMPANY NAME IS : %v",matches)
 	return matches
