@@ -69,6 +69,7 @@ LinkedIn Scraper is easy to use. Here's a quick guide to get you started:
 
 ### Setting up Environment Variables
   ![env](https://github.com/user-attachments/assets/3efb32fd-812c-4b09-a6b4-a1913c08827d)
+
 To use LinkedIn Scraper, you need to provide your LinkedIn CSRF token and cookie. Here's how to get them:
 
 1. **Log in to LinkedIn in your web browser.**
@@ -81,6 +82,8 @@ To use LinkedIn Scraper, you need to provide your LinkedIn CSRF token and cookie
    ![Network Tab](https://github.com/user-attachments/assets/66a1f6e8-abb3-4ef3-a01a-1d91b7f58752)
 
 7. **Create a `.env` file in the Top Directory** and add these values:
+
+Side Note : Emails are not 100% guaranteed It's just a recommendation since most of the companies put FirstName.LastName@Company.com
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
