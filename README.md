@@ -83,5 +83,7 @@ To use LinkedIn Scraper, you need to provide your LinkedIn CSRF token and cookie
 
 7. **Create a `.env` file in the Top Directory** and add these values:
 
+Side Note : Emails are not 100% guaranteed It's just a recommendation since most of the companies put FirstName.LastName@Company.com
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
