@@ -5,7 +5,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img src="images/First View.png" alt="Logo" >
+    <img src="Images/First View.png" alt="Logo" >
   <h3 align="center">LinkedIn Scraper</h3>
 
   <p align="center">
