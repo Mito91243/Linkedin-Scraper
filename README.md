@@ -69,6 +69,7 @@ LinkedIn Scraper is easy to use. Here's a quick guide to get you started:
 
 ### Setting up Environment Variables
   ![env](https://github.com/user-attachments/assets/3efb32fd-812c-4b09-a6b4-a1913c08827d)
+
 To use LinkedIn Scraper, you need to provide your LinkedIn CSRF token and cookie. Here's how to get them:
 
 1. **Log in to LinkedIn in your web browser.**
