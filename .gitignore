@@ -1,1 +1,5 @@
+#Env Variables
 .env
+
+#Current Build
+main.exe

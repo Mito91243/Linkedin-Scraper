@@ -73,7 +73,7 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 	color.Cyan("\n🔍 Extracted Profiles:")
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Profile", "Full Name", "Last Name", "Position", "Profile URL"})
+	table.SetHeader([]string{"Profile", "Full Name", "Last Name", "Position", "Email"})
 	table.SetColumnColor(
 		tablewriter.Colors{tablewriter.FgHiGreenColor},
 		tablewriter.Colors{tablewriter.FgHiBlueColor},
@@ -95,7 +95,7 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 			FullName:   utils.SafeGetString(profile, "fullName"),
 			LastName:   utils.SafeGetString(profile, "lastName"),
 			Position:   utils.SafeGetString(profile, "position"),
-			ProfileURN: utils.SafeGetString(profile, "Possible Email"),
+			ProfileURN: utils.SafeGetString(profile, "Email"),
 		}
 		emailFirst := strings.Split(temp_profile.FullName, " ")[0]
 		emailLast := strings.Split(temp_profile.FullName, " ")[len(strings.Split(temp_profile.FullName, " "))-1]
