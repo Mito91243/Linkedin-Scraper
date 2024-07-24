@@ -17,7 +17,7 @@ import (
 
 func Start() {
 	utils.PrintHeader()
-	err := godotenv.Load("../.env")
+	err := godotenv.Load("./.env")
 	if err != nil {
 		fmt.Print(err)
 		fmt.Println("❌ Error loading .env file")
