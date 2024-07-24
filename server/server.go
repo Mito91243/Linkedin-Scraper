@@ -2,9 +2,9 @@ package server
 
 import (
 	"fmt"
-	"main/internal/utils"
 	"main/internal/api"
 	"main/internal/models"
+	"main/internal/utils"
 	"net/http"
 	"os"
 	"strings"
@@ -17,7 +17,7 @@ import (
 
 func Start() {
 	utils.PrintHeader()
-	err := godotenv.Load("../.env")
+	err := godotenv.Load("./.env")
 	if err != nil {
 		fmt.Print(err)
 		fmt.Println("❌ Error loading .env file")
@@ -34,7 +34,7 @@ func Start() {
 	companyIdchan := make(chan string)
 	positionIdchan := make(chan string)
 	go func() {
-		companyID, _ := api.Get_company_id(client, companyName)
+		companyID, _ := api.GetCompanyId(client, companyName)
 		companyIdchan <- companyID
 	}()
 	go func() {
@@ -58,7 +58,7 @@ func Start() {
 
 func Run(companyName string, url string, client *http.Client) []models.ProfileRes {
 	start := time.Now()
-	body, status := api.Get_Req(url, client)
+	body, status := api.GetReq(url, client)
 	if status != 200 {
 		color.Red("Error making GET request: %v", status)
 		return nil

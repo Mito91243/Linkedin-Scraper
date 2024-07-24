@@ -1,13 +1,16 @@
 package api
+
 import (
 	"fmt"
+	"io"
+	"main/internal/utils"
 	"net/http"
 	"os"
 	"regexp"
-	"main/internal/utils"
+	"strings"
 )
 
-func Get_Req(url string, client *http.Client) ([]byte, int) {
+func GetReq(url string, client *http.Client) ([]byte, int) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println("❌ Error creating request:", err)
@@ -45,9 +48,44 @@ func Get_Req(url string, client *http.Client) ([]byte, int) {
 	return body, res.StatusCode
 }
 
-func Get_company_id(client *http.Client, companyName string) (string, error) {
+func GetCompanyName(client *http.Client, inputCompany string) string {
+	url := "https://www.google.com/search?q=" + inputCompany + "+linkedin"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("❌ Error creating request:", err)
+		return " "
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("❌ Error executing request:", err)
+		return " "
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Printf("🌐 Connection Error With Status Code: %d\n", res.StatusCode)
+		return " "
+	}
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("❌ Error reading response body:", err)
+		return " "
+	}
+
+	bodyString := string(bodyBytes)
+
+	matches := strings.Split(bodyString, "www.linkedin.com/company/")[1]
+	matches = strings.Split(matches, "&")[0]
+	//fmt.Printf("COMPANY NAME IS : %v",matches)
+	return matches
+}
+
+func GetCompanyId(client *http.Client, companyName string) (string, error) {
+	companyName = GetCompanyName(client, companyName)
 	url := "https://www.linkedin.com/company/" + companyName + "/people/"
-	resp, status := Get_Req(url, client)
+	resp, status := GetReq(url, client)
 	if status != 200 {
 		return "0", fmt.Errorf("error making GET request: %v", status)
 	}
@@ -63,6 +101,3 @@ func Get_company_id(client *http.Client, companyName string) (string, error) {
 
 	return companyID, nil
 }
-
-
-
