@@ -48,11 +48,15 @@ func Start() {
 	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:48)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
 
 	profiles := Run(companyEmail, url, client)
-	utils.EncodeProfiles(profiles)
+
+	//utils.EncodeProfiles(profiles)
 	fmt.Println(strings.Repeat("-", 60))
 
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
 	fmt.Println(strings.Repeat("=", 60))
+	//! Call a generic Get_Req_Google With GO and pass a chan string to post or link in post if possible
+	utils.GetPostsUrls(profiles, companyName, 0)
+	//!
 	fmt.Scanln()
 }
 
@@ -87,22 +91,28 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 	table.SetColWidth(50)
 
 	var profiles []models.ProfileRes
+	tempC := 0
 	for i, profile := range results {
 		if _, ok := profile["position"]; !ok {
 			continue
 		}
+
 		temp_profile := models.ProfileRes{
 			FullName:   utils.SafeGetString(profile, "fullName"),
 			LastName:   utils.SafeGetString(profile, "lastName"),
 			Position:   utils.SafeGetString(profile, "position"),
 			ProfileURN: utils.SafeGetString(profile, "Email"),
 		}
+		if temp_profile.LastName == "Member" {
+			tempC++
+			continue
+		}
 		emailFirst := strings.Split(temp_profile.FullName, " ")[0]
 		emailLast := strings.Split(temp_profile.FullName, " ")[len(strings.Split(temp_profile.FullName, " "))-1]
 		email := emailFirst + "." + emailLast + "@" + companyName + ".com"
 
 		table.Append([]string{
-			fmt.Sprintf("Profile %d", i+1-len(results)/2),
+			fmt.Sprintf("Profile %d", i-tempC+1-len(results)/2),
 			utils.TruncateString(temp_profile.FullName, 20),
 			utils.TruncateString(temp_profile.LastName, 15),
 			utils.TruncateString(temp_profile.Position, 100),

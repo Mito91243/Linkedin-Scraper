@@ -3,8 +3,12 @@ package api
 import (
 	"fmt"
 	"io"
+
+	//"main/internal/models"
 	"main/internal/utils"
 	"net/http"
+
+	//"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -50,32 +54,7 @@ func GetReq(url string, client *http.Client) ([]byte, int) {
 
 func GetCompanyName(client *http.Client, inputCompany string) string {
 	url := "https://www.google.com/search?q=" + inputCompany + "+linkedin"
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		fmt.Println("❌ Error creating request:", err)
-		return " "
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println("❌ Error executing request:", err)
-		return " "
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		fmt.Printf("🌐 Connection Error With Status Code: %d\n", res.StatusCode)
-		return " "
-	}
-
-	bodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("❌ Error reading response body:", err)
-		return " "
-	}
-
-	bodyString := string(bodyBytes)
-
+	bodyString := GetReqGoogle(url, client)
 	matches := strings.Split(bodyString, "company/")[1]
 	matches = strings.Split(matches, "&")[0]
 	//fmt.Printf("COMPANY NAME IS : %v",matches)
@@ -100,4 +79,32 @@ func GetCompanyId(client *http.Client, companyName string) (string, error) {
 	companyID := string(matches[1])
 
 	return companyID, nil
+}
+
+func GetReqGoogle(url string, client *http.Client) string {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("❌ Error creating request:", err)
+		return " "
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("❌ Error executing request:", err)
+		return " "
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Printf("🌐 Connection Error With Status Code: %d\n", res.StatusCode)
+		return " "
+	}
+
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("❌ Error reading response body:", err)
+		return " "
+	}
+
+	return string(bodyBytes)
 }
