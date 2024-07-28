@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fatih/color"
@@ -55,7 +56,25 @@ func Start() {
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
 	fmt.Println(strings.Repeat("=", 60))
 	//! Call a generic Get_Req_Google With GO and pass a chan string to post or link in post if possible
-	utils.GetPostsUrls(profiles, companyName, 0)
+	urls := utils.GetPostsUrls(profiles, companyName, 0)
+	ch := make(chan string, len(urls))
+
+	var wg sync.WaitGroup
+
+	for _, url := range urls {
+		wg.Add(1)
+
+		go func() {
+			//fmt.Printf("URL : %v\n", url)
+			ch <- api.GetReqGoogle(url, client)
+
+		}()
+	}
+	result2:=<-ch
+	/*for result := range ch {
+	}*/
+	fmt.Println(result2)
+
 	//!
 	fmt.Scanln()
 }

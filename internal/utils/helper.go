@@ -35,7 +35,7 @@ func GetPostsUrls(people []models.ProfileRes, companyName string, counter int) [
 		finalQ = finalQ + AddedName
 		counter++
 		if counter == 13 {
-			GetPostsUrls(people[12:], companyName, 0)
+			urls = GetPostsUrls(people[12:], companyName, 0)
 			break
 		}
 	}
