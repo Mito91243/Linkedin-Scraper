@@ -8,27 +8,6 @@ import (
 	"strings"
 )
 
-func PrintHeader() {
-	color.Set(color.FgGreen)
-	fmt.Println("------------------------------------------------------------------------")
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("  _      _        _            _  _          _____                                ")
-	fmt.Println(" | |    (_)      | |          |  (_)        / ____|                               ")
-	fmt.Println(" | |     _ _ __  | | _____  __| |_ _ __    | (___   ___ _ __ __ _ _ __   ___ _ __ ")
-	fmt.Println(" | |    | | '_ \\| |/ / _ \\/ _` | | '_  \\   \\___ \\ / __| '__/ _` | '_ \\ / _ \\ '__|")
-	fmt.Println(" | |____| | | | |   <  __/ (_| | | | | |    ____) | (__| | | (_| | |_) |  __/ |   ")
-	fmt.Println(" |______|_|_| |_|_|\\_\\___|\\__,_ |_| ||_|   |_____/ \\___|_|  \\__,_| .__/ \\___|_|   ")
-	fmt.Println("                                                                 | |                  ")
-	fmt.Println("                                                                 |_|                  ")
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("   Welcome to LinkedIn Scraper! Enter Company Name to Start.")
-	fmt.Println()
-	fmt.Println("------------------------------------------------------------------------")
-	color.Unset()
-}
-
 func Read_input() string {
 	scanner := bufio.NewScanner(os.Stdin)
 

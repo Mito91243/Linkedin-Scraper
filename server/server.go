@@ -2,18 +2,14 @@ package server
 
 import (
 	"fmt"
+	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 	"main/internal/api"
 	"main/internal/models"
 	"main/internal/utils"
 	"net/http"
-	"os"
 	"strings"
-	//"sync"
 	"time"
-
-	"github.com/fatih/color"
-	"github.com/joho/godotenv"
-	"github.com/olekukonko/tablewriter"
 )
 
 func Start() {
@@ -27,10 +23,6 @@ func Start() {
 
 	client := &http.Client{}
 	companyName := utils.Read_input()
-	companyEmail := companyName
-	if len(strings.Split(companyName, "-")) > 1 {
-		companyEmail = strings.Split(companyName, "-")[0]
-	}
 	start := time.Now()
 	companyIdchan := make(chan string)
 	positionIdchan := make(chan string)
@@ -46,9 +38,16 @@ func Start() {
 	positionIdentifier := <-positionIdchan
 	// if you need a specific country to scrape from put this (key:geoUrn,value:List(102713980)) before (key:resultType in the url  . Here we getting indian people
 	// The id List(id) in here is the id of the country so change it depending on what country you want to scrape from . Here is USA for reference : 103644278
-	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:48)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
-
-	profiles := Run(companyEmail, url, client)
+	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
+	profiles := Run(companyName, url, client)
+	// Get Talent Acquisition personnel
+	if positionIdentifier == "12" {
+		urlTalentAcquisition := "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=false&variables=(start:0,origin:FACETED_SEARCH,query:(keywords:Talent%20acquisition,flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.ff737c692102a8ce842be8f129f834ae"
+		profilesExtended := Run(companyName, urlTalentAcquisition, client)
+		profiles = append(profiles, profilesExtended...)
+	}
+	utils.DisplayProfiles(profiles)
+	color.Yellow("\n✨ Time to fetch %d profiles: %.2f seconds\n", len(profiles), time.Since(start).Seconds())
 
 	//utils.EncodeProfiles(profiles)
 	fmt.Println(strings.Repeat("-", 60))
@@ -59,7 +58,7 @@ func Start() {
 	//! After Trial & Error This is not possible due google rate limiting
 	//? Maybe Make 2 URL Calls and sleep for 30-40 Sec ?
 	urls := utils.GetPostsUrls(profiles, companyName, 0)
-	for _ , url := range urls {
+	for _, url := range urls {
 		fmt.Println(url)
 	}
 
@@ -68,7 +67,6 @@ func Start() {
 }
 
 func Run(companyName string, url string, client *http.Client) []models.ProfileRes {
-	start := time.Now()
 	body, status := api.GetReq(url, client)
 	if status != 200 {
 		color.Red("Error making GET request: %v", status)
@@ -81,25 +79,9 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 		return nil
 	}
 
-	color.Cyan("\n🔍 Extracted Profiles:")
-
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Profile", "Full Name", "Last Name", "Position", "Email"})
-	table.SetColumnColor(
-		tablewriter.Colors{tablewriter.FgHiGreenColor},
-		tablewriter.Colors{tablewriter.FgHiBlueColor},
-		tablewriter.Colors{tablewriter.FgBlueColor},
-		tablewriter.Colors{tablewriter.FgYellowColor},
-		tablewriter.Colors{tablewriter.FgMagentaColor},
-	)
-
-	table.SetAutoWrapText(false)
-	table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
-	table.SetColWidth(50)
-
+	// Convert Profiles interfaces to strings and Guess emails
 	var profiles []models.ProfileRes
-	tempC := 0
-	for i, profile := range results {
+	for _, profile := range results {
 		if _, ok := profile["position"]; !ok {
 			continue
 		}
@@ -110,27 +92,14 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 			Position:   utils.SafeGetString(profile, "position"),
 			ProfileURN: utils.SafeGetString(profile, "Email"),
 		}
-		if temp_profile.LastName == "Member" {
-			tempC++
-			continue
-		}
+
+		// Predict the email of each user
 		emailFirst := strings.Split(temp_profile.FullName, " ")[0]
 		emailLast := strings.Split(temp_profile.FullName, " ")[len(strings.Split(temp_profile.FullName, " "))-1]
 		email := emailFirst + "." + emailLast + "@" + companyName + ".com"
-
-		table.Append([]string{
-			fmt.Sprintf("Profile %d", i-tempC+1-len(results)/2),
-			utils.TruncateString(temp_profile.FullName, 20),
-			utils.TruncateString(temp_profile.LastName, 15),
-			utils.TruncateString(temp_profile.Position, 100),
-			utils.TruncateString(email, 40),
-		})
-
+		temp_profile.ProfileURN = email
 		profiles = append(profiles, temp_profile)
 	}
 
-	table.Render()
-
-	color.Yellow("\n✨ Time to fetch %d profiles: %.2f seconds\n", len(profiles), time.Since(start).Seconds())
 	return profiles
 }
