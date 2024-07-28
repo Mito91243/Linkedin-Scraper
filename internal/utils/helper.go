@@ -42,7 +42,7 @@ func GetPostsUrls(people []models.ProfileRes, companyName string, counter int) [
 	//fmt.Printf("Number of Valid Profiles: %v\n",counter)
 
 	lookFor := "internship"
-	url := "https://www.google.com/search?q=site%3Alinkedin.com+" + "Post" + "+intext%3A%22" + companyName + "%22+intext%3A%22" + lookFor + "%22+%28intitle%3A%22JohnDoeLOL" + finalQ + "%29"
+	url := "https://www.google.com/search?q=site%3Alinkedin.com+inurl%3A%22posts%22+intext%3A%22" + companyName + "%22+intext%3A%22" + lookFor + "%22+%28intitle%3A%22JohnDoeLOL" + finalQ + "%22%29"
 	//fmt.Println(url)
 	urls = append(urls, url)
 	return urls

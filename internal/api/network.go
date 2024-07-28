@@ -3,12 +3,8 @@ package api
 import (
 	"fmt"
 	"io"
-
-	//"main/internal/models"
 	"main/internal/utils"
 	"net/http"
-
-	//"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -55,15 +51,17 @@ func GetReq(url string, client *http.Client) ([]byte, int) {
 func GetCompanyName(client *http.Client, inputCompany string) string {
 	url := "https://www.google.com/search?q=" + inputCompany + "+linkedin"
 	bodyString := GetReqGoogle(url, client)
+
 	matches := strings.Split(bodyString, "company/")[1]
 	matches = strings.Split(matches, "&")[0]
-	//fmt.Printf("COMPANY NAME IS : %v",matches)
+	//fmt.Println(matches)
 	return matches
 }
 
 func GetCompanyId(client *http.Client, companyName string) (string, error) {
 	companyName = GetCompanyName(client, companyName)
 	url := "https://www.linkedin.com/company/" + companyName + "/people/"
+
 	resp, status := GetReq(url, client)
 	if status != 200 {
 		return "0", fmt.Errorf("error making GET request: %v", status)
@@ -85,25 +83,27 @@ func GetReqGoogle(url string, client *http.Client) string {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println("❌ Error creating request:", err)
-		return " "
+		return "1 "
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println("❌ Error executing request:", err)
-		return " "
+		return " 2"
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		fmt.Printf("🌐 Connection Error With Status Code: %d\n", res.StatusCode)
-		return " "
+		fmt.Printf("🌐 Connection Errorss With Status Code: %d\n", res.StatusCode)
+		fmt.Printf("url: %v\n", url)
+
+		return "3 "
 	}
 
 	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("❌ Error reading response body:", err)
-		return " "
+		return "4 "
 	}
 
 	return string(bodyBytes)

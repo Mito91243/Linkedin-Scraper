@@ -41,7 +41,7 @@ func Read_input() string {
 			fmt.Print("📝 Enter Company Name: ")
 
 		} else {
-			text = strings.Replace(text, " ", "-", 1)
+			text = strings.Replace(text, " ", "+", 3)
 			return strings.ToLower(text)
 		}
 	}
