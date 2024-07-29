@@ -39,17 +39,29 @@ func Start() {
 	// if you need a specific country to scrape from put this (key:geoUrn,value:List(102713980)) before (key:resultType in the url  . Here we getting indian people
 	// The id List(id) in here is the id of the country so change it depending on what country you want to scrape from . Here is USA for reference : 103644278
 	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
-	profiles := Run(companyName, url, client)
+	url2 := "https://www.linkedin.com/voyager/api/graphql?variables=(start:49,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
+	
+	firstPatch := make(chan []models.ProfileRes)
+	SecondPatch := make(chan []models.ProfileRes)
+	go func ()  {
+		firstPatch <- Run(companyName, url, client)
+	}()
+	go func ()  {
+		SecondPatch <- Run(companyName, url2, client)
+	}()
+	profiles := <- firstPatch
+	profiles2 := <- SecondPatch
+	profiles = append(profiles, profiles2...)
+	
 	// Get Talent Acquisition personnel
 	if positionIdentifier == "12" {
-		urlTalentAcquisition := "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=false&variables=(start:0,origin:FACETED_SEARCH,query:(keywords:Talent%20acquisition,flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.ff737c692102a8ce842be8f129f834ae"
+		urlTalentAcquisition := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:Talent%20acquisition,flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.ff737c692102a8ce842be8f129f834ae"
 		profilesExtended := Run(companyName, urlTalentAcquisition, client)
 		profiles = append(profiles, profilesExtended...)
 	}
 	utils.DisplayProfiles(profiles)
 	color.Yellow("\n✨ Time to fetch %d profiles: %.2f seconds\n", len(profiles), time.Since(start).Seconds())
 
-	//utils.EncodeProfiles(profiles)
 	fmt.Println(strings.Repeat("-", 60))
 
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
@@ -96,6 +108,7 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 		// Predict the email of each user
 		emailFirst := strings.Split(temp_profile.FullName, " ")[0]
 		emailLast := strings.Split(temp_profile.FullName, " ")[len(strings.Split(temp_profile.FullName, " "))-1]
+		companyName = strings.ReplaceAll(companyName, "+", "")
 		email := emailFirst + "." + emailLast + "@" + companyName + ".com"
 		temp_profile.ProfileURN = email
 		profiles = append(profiles, temp_profile)
