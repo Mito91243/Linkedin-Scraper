@@ -79,53 +79,60 @@ func ExtractProfiles(jsonData []byte) ([]map[string]interface{}, error) {
 }
 
 func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
-    var resp models.Post
-    err := json.Unmarshal(jsonData, &resp)
-    if err != nil {
-        return nil, err
-    }
+	var resp models.Post
+	err := json.Unmarshal(jsonData, &resp)
+	if err != nil {
+		return nil, err
+	}
 
-    var posts []models.PostRes
-    socialCounts := make(map[string]models.PostRes)
+	var posts []models.PostRes
+	socialCounts := make(map[string]models.PostRes)
+	seenURNs := make(map[string]bool)
 
-    // First pass: collect social activity counts
-    for _, item := range resp.Included {
-        if strings.Contains(item.EntityUrn, "fsd_socialActivityCounts") {
-            urn := strings.TrimPrefix(item.Urn, "urn:li:activity:")
-            socialCounts[urn] = models.PostRes{
-                NumLikes:    item.NumLikes,
-                NumComments: item.NumComments,
-            }
-        }
-    }
+	// First pass: collect social activity counts
+	for _, item := range resp.Included {
+		if strings.Contains(item.EntityUrn, "fsd_socialActivityCounts") {
+			urn := strings.TrimPrefix(item.Urn, "urn:li:activity:")
+			socialCounts[urn] = models.PostRes{
+				NumLikes:    item.NumLikes,
+				NumComments: item.NumComments,
+			}
+		}
+	}
 
-    // Second pass: extract posts and merge with social counts
-    for _, item := range resp.Included {
-        if strings.Contains(item.EntityUrn, "fsd_update") {
-            urn := strings.TrimPrefix(item.EntityUrn, "urn:li:fsd_update:(urn:li:activity:")
-            urn = strings.Split(urn, ",")[0]
+	// Second pass: extract posts and merge with social counts
+	for _, item := range resp.Included {
+		if strings.Contains(item.EntityUrn, "fsd_update") && !strings.Contains(item.EntityUrn, "fsd_updateActions") {
+			urn := strings.TrimPrefix(item.EntityUrn, "urn:li:fsd_update:(urn:li:activity:")
+			urn = strings.Split(urn, ",")[0]
 
-            post := models.PostRes{
-                URN:          item.EntityUrn,
-                ActionTarget: item.Content.ArticleComponent.NavigationContext.ActionTarget,
-                Name:         item.Actor.Name.Text,
-                Text:         item.Commentary.Text.Text,
-            }
+			// Check if we've already seen this URN
+			if seenURNs[urn] {
+				continue
+			}
+			seenURNs[urn] = true
 
-            if post.Text == "" {
-                post.Text = item.Content.ArticleComponent.Title.Text
-            }
+			post := models.PostRes{
+				URN:          item.EntityUrn,
+				ActionTarget: item.Content.ArticleComponent.NavigationContext.ActionTarget,
+				Name:         item.Actor.Name.Text,
+				Text:         item.Commentary.Text.Text,
+			}
 
-            if counts, ok := socialCounts[urn]; ok {
-                post.NumLikes = counts.NumLikes
-                post.NumComments = counts.NumComments
-            }
+			if post.Text == "" {
+				post.Text = item.Content.ArticleComponent.Title.Text
+			}
+
+			if counts, ok := socialCounts[urn]; ok {
+				post.NumLikes = counts.NumLikes
+				post.NumComments = counts.NumComments
+			}
+
 			if post.Text != "" && post.Name != "" {
-                posts = append(posts, post)
-            }
-            posts = append(posts, post)
-        }
-    }
+				posts = append(posts, post)
+			}
+		}
+	}
 
-    return posts, nil
+	return posts, nil
 }

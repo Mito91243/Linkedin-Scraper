@@ -122,19 +122,5 @@ func GetPosts(url string, client *http.Client) {
 	}
 
 	fmt.Printf("Status: %d\n\n", status)
-
-	for i, post := range results {
-		fmt.Printf("Post #%d:\n", i+1)
-		fmt.Printf("  Name: %s\n", post.Name)
-		fmt.Printf("  Post Content: %s\n", post.Text)
-		fmt.Printf("  Reactions: %d\n", post.NumLikes)
-		fmt.Printf("  Comments: %d\n", post.NumComments)
-		fmt.Printf("  Post URN: %s\n", post.URN)
-		if post.ActionTarget != "" {
-			fmt.Printf("  Application Link: %s\n", post.ActionTarget)
-		}
-		fmt.Println()
-	}
-
-	fmt.Printf("Total posts extracted: %d\n", len(results))
+	utils.DisplayPosts(results)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"main/internal/models"
 	"os"
+	"strings"
 )
 
 func DisplayProfiles(profiles []models.ProfileRes) {
@@ -61,4 +62,46 @@ func PrintHeader() {
 	fmt.Println()
 	fmt.Println("------------------------------------------------------------------------")
 	color.Unset()
+}
+
+func DisplayPosts(posts []models.PostRes) {
+	color.Cyan("\n📝 Extracted Posts:")
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Post", "Author", "Content", "Reactions", "Comments", "URN", "Application Link"})
+	table.SetColumnColor(
+		tablewriter.Colors{tablewriter.FgHiGreenColor},
+		tablewriter.Colors{tablewriter.FgHiBlueColor},
+		tablewriter.Colors{tablewriter.FgBlueColor},
+		tablewriter.Colors{tablewriter.FgYellowColor},
+		tablewriter.Colors{tablewriter.FgMagentaColor},
+		tablewriter.Colors{tablewriter.FgCyanColor},
+		tablewriter.Colors{tablewriter.FgHiMagentaColor},
+	)
+
+	table.SetAutoWrapText(false)
+	table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
+	table.SetColWidth(150) // Adjust this value as needed
+
+	for i, post := range posts {
+		urn := TruncateString(strings.TrimPrefix(post.URN, "urn:li:fsd_update:(urn:li:activity:"), 20)
+		content := strings.ReplaceAll(post.Text, "\n", " ")
+		applicationLink := TruncateString(post.ActionTarget, 30)
+		if applicationLink == "" {
+			applicationLink = "N/A"
+		}
+		table.Append([]string{
+			fmt.Sprintf("Post %d", i+1),
+			TruncateString(post.Name, 20),
+			TruncateString(content, 100), // Reduced to make room for the new column
+			fmt.Sprintf("%d", post.NumLikes),
+			fmt.Sprintf("%d", post.NumComments),
+			urn,
+			applicationLink,
+		})
+	}
+
+	table.Render()
+
+	fmt.Printf("\nTotal posts extracted: %d\n", len(posts))
 }
