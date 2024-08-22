@@ -235,4 +235,5 @@ type ProfileRes struct {
 	LastName   string `json:"lastName"`
 	Position   string `json:"position"`
 	ProfileURN string `json:"profileURN"`
+	Link       string `json:"bserpEntityNavigationalUrl"`
 }

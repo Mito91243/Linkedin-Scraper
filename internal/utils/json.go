@@ -59,10 +59,9 @@ func ExtractProfiles(jsonData []byte) ([]map[string]interface{}, error) {
 		if strings.Contains(item.EntityUrn, "urn:li:fsd_profile:") {
 			profile := make(map[string]interface{})
 			profile["entityUrn"] = item.NavigationURL
-
 			fullName := item.Title.Text
 			profile["fullName"] = fullName
-
+			profile["bserpEntityNavigationalUrl"] = item.BserpEntityNavigationalURL
 			nameParts := strings.Split(fullName, " ")
 			if len(nameParts) > 0 {
 				profile["lastName"] = nameParts[len(nameParts)-1]

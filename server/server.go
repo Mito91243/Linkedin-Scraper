@@ -40,19 +40,19 @@ func Start() {
 	// The id List(id) in here is the id of the country so change it depending on what country you want to scrape from . Here is USA for reference : 103644278
 	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
 	url2 := "https://www.linkedin.com/voyager/api/graphql?variables=(start:49,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + positionIdentifier + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
-	
+
 	firstPatch := make(chan []models.ProfileRes)
 	SecondPatch := make(chan []models.ProfileRes)
-	go func ()  {
+	go func() {
 		firstPatch <- Run(companyName, url, client)
 	}()
-	go func ()  {
+	go func() {
 		SecondPatch <- Run(companyName, url2, client)
 	}()
-	profiles := <- firstPatch
-	profiles2 := <- SecondPatch
+	profiles := <-firstPatch
+	profiles2 := <-SecondPatch
 	profiles = append(profiles, profiles2...)
-	
+
 	// Get Talent Acquisition personnel
 	if positionIdentifier == "12" {
 		urlTalentAcquisition := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:Talent%20acquisition,flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.ff737c692102a8ce842be8f129f834ae"
@@ -66,15 +66,9 @@ func Start() {
 
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
 	fmt.Println(strings.Repeat("=", 60))
-	//! Call a generic Get_Req_Google With GO and pass a chan string to post or link in post if possible
-	//! After Trial & Error This is not possible due google rate limiting
-	//? Maybe Make 2 URL Calls and sleep for 30-40 Sec ?
-	urls := utils.GetPostsUrls(profiles, companyName, 0)
-	for _, url := range urls {
-		fmt.Println(url)
-	}
-
-	//!
+	//! POSTS INCOMING STARTS HERE
+	postsQuery := utils.GetPostQuery(profiles,client)
+	GetPosts(postsQuery,client)
 	fmt.Scanln()
 }
 
@@ -103,6 +97,7 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 			LastName:   utils.SafeGetString(profile, "lastName"),
 			Position:   utils.SafeGetString(profile, "position"),
 			ProfileURN: utils.SafeGetString(profile, "Email"),
+			Link:       utils.SafeGetString(profile, "bserpEntityNavigationalUrl"),
 		}
 
 		// Predict the email of each user
@@ -115,4 +110,9 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 	}
 
 	return profiles
+}
+
+func GetPosts(url string, client *http.Client) {
+	_,status := api.GetReq(url,client)
+	fmt.Print(status)
 }

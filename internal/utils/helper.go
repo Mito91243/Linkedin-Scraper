@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"main/internal/models"
+	"net/http"
 	"strings"
-	//"fmt"
 )
 
 func SafeGetString(m map[string]interface{}, key string) string {
@@ -22,28 +23,21 @@ func TruncateString(s string, maxLength int) string {
 	return s
 }
 
-func GetPostsUrls(people []models.ProfileRes, companyName string, counter int) []string {
-	var finalQ string
-	var urls []string
-
-	for _, profile := range people {
-
-		//tempF := strings.Replace(profile.FullName,"."," ",3)
-		tempF := strings.Replace(profile.FullName, " ", "+", 3)
-		spacer := "+OR+intitle%3A%22"
-		AddedName := "%22" + spacer + tempF
-		finalQ = finalQ + AddedName
-		counter++
-		if counter == 13 {
-			urls = GetPostsUrls(people[12:], companyName, 0)
-			break
+func GetPostQuery(people []models.ProfileRes,client *http.Client) string {
+	final := ""
+	for _, person := range people {
+		if person.LastName == "Member" {
+			continue
 		}
+		temp := fmt.Sprintf("%v,", strings.Split(person.Link, "%")[len(strings.Split(person.Link, "%"))-1])
+		final += temp
+		//fmt.Printf("Profile URN: %s, Name: %s\n", strings.Split(person.Link,"%")[len(strings.Split(person.Link,"%"))-1] , person.FullName)
 	}
-	//fmt.Printf("Number of Valid Profiles: %v\n",counter)
-
-	lookFor := "internship"
-	url := "https://www.google.com/search?q=site%3Alinkedin.com+inurl%3A%22posts%22+intext%3A%22" + companyName + "%22+intext%3A%22" + lookFor + "%22+%28intitle%3A%22JohnDoeLOL" + finalQ + "%22%29"
-	//fmt.Println(url)
-	urls = append(urls, url)
-	return urls
+	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:internship,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(" + final + ")),(key:resultType,value:List(CONTENT)),(key:sortBy,value:List(relevance))),includeFiltersInResponse:false),count:3)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
+	return url
 }
+
+//https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:internship,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(ACoAADttcpsBxvTz1m-uBKP0JaSchHJGifSGGHY,ACoAACbk0-gBoc1GMeV3vMrr8M7eUwAtK9GkvAw)),(key:resultType,value:List(CONTENT)),(key:sortBy,value:List(relevance))),includeFiltersInResponse:false),count:3)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7
+//! Make Model for Job Post
+//! Api Call with all ID's
+//! Data text.text (string)// Reactions(Int) // OP name // Post link(string) // Comments (INt)
