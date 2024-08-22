@@ -77,3 +77,55 @@ func ExtractProfiles(jsonData []byte) ([]map[string]interface{}, error) {
 
 	return profiles, nil
 }
+
+func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
+    var resp models.Post
+    err := json.Unmarshal(jsonData, &resp)
+    if err != nil {
+        return nil, err
+    }
+
+    var posts []models.PostRes
+    socialCounts := make(map[string]models.PostRes)
+
+    // First pass: collect social activity counts
+    for _, item := range resp.Included {
+        if strings.Contains(item.EntityUrn, "fsd_socialActivityCounts") {
+            urn := strings.TrimPrefix(item.Urn, "urn:li:activity:")
+            socialCounts[urn] = models.PostRes{
+                NumLikes:    item.NumLikes,
+                NumComments: item.NumComments,
+            }
+        }
+    }
+
+    // Second pass: extract posts and merge with social counts
+    for _, item := range resp.Included {
+        if strings.Contains(item.EntityUrn, "fsd_update") {
+            urn := strings.TrimPrefix(item.EntityUrn, "urn:li:fsd_update:(urn:li:activity:")
+            urn = strings.Split(urn, ",")[0]
+
+            post := models.PostRes{
+                URN:          item.EntityUrn,
+                ActionTarget: item.Content.ArticleComponent.NavigationContext.ActionTarget,
+                Name:         item.Actor.Name.Text,
+                Text:         item.Commentary.Text.Text,
+            }
+
+            if post.Text == "" {
+                post.Text = item.Content.ArticleComponent.Title.Text
+            }
+
+            if counts, ok := socialCounts[urn]; ok {
+                post.NumLikes = counts.NumLikes
+                post.NumComments = counts.NumComments
+            }
+			if post.Text != "" && post.Name != "" {
+                posts = append(posts, post)
+            }
+            posts = append(posts, post)
+        }
+    }
+
+    return posts, nil
+}

@@ -67,8 +67,8 @@ func Start() {
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
 	fmt.Println(strings.Repeat("=", 60))
 	//! POSTS INCOMING STARTS HERE
-	postsQuery := utils.GetPostQuery(profiles,client)
-	GetPosts(postsQuery,client)
+	postsQuery := utils.GetPostQuery(profiles, client)
+	GetPosts(postsQuery, client)
 	fmt.Scanln()
 }
 
@@ -113,6 +113,28 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 }
 
 func GetPosts(url string, client *http.Client) {
-	_,status := api.GetReq(url,client)
-	fmt.Print(status)
+	body, status := api.GetReq(url, client)
+	results, err := utils.ExtractPosts(body)
+
+	if err != nil {
+		fmt.Printf("Error extracting posts: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Status: %d\n\n", status)
+
+	for i, post := range results {
+		fmt.Printf("Post #%d:\n", i+1)
+		fmt.Printf("  Name: %s\n", post.Name)
+		fmt.Printf("  Post Content: %s\n", post.Text)
+		fmt.Printf("  Reactions: %d\n", post.NumLikes)
+		fmt.Printf("  Comments: %d\n", post.NumComments)
+		fmt.Printf("  Post URN: %s\n", post.URN)
+		if post.ActionTarget != "" {
+			fmt.Printf("  Application Link: %s\n", post.ActionTarget)
+		}
+		fmt.Println()
+	}
+
+	fmt.Printf("Total posts extracted: %d\n", len(results))
 }
