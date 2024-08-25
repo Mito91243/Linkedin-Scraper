@@ -68,7 +68,7 @@ func DisplayPosts(posts []models.PostRes) {
 	color.Cyan("\n📝 Extracted Posts:")
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Post", "Author", "Content", "Reactions", "Comments", "URN", "Application Link"})
+	table.SetHeader([]string{"Post", "Author", "Content", "Reactions", "Comments", "URN", "Date", "Action Target"})
 	table.SetColumnColor(
 		tablewriter.Colors{tablewriter.FgHiGreenColor},
 		tablewriter.Colors{tablewriter.FgHiBlueColor},
@@ -77,27 +77,42 @@ func DisplayPosts(posts []models.PostRes) {
 		tablewriter.Colors{tablewriter.FgMagentaColor},
 		tablewriter.Colors{tablewriter.FgCyanColor},
 		tablewriter.Colors{tablewriter.FgHiMagentaColor},
+		tablewriter.Colors{tablewriter.FgHiYellowColor},
 	)
 
 	table.SetAutoWrapText(false)
-	table.SetColumnAlignment([]int{tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_RIGHT, tablewriter.ALIGN_LEFT, tablewriter.ALIGN_LEFT})
+	table.SetColumnAlignment([]int{
+		tablewriter.ALIGN_LEFT, 
+		tablewriter.ALIGN_LEFT, 
+		tablewriter.ALIGN_LEFT, 
+		tablewriter.ALIGN_RIGHT, 
+		tablewriter.ALIGN_RIGHT, 
+		tablewriter.ALIGN_LEFT, 
+		tablewriter.ALIGN_LEFT,
+		tablewriter.ALIGN_LEFT,
+	})
 	table.SetColWidth(150) // Adjust this value as needed
 
 	for i, post := range posts {
 		urn := TruncateString(strings.TrimPrefix(post.URN, "urn:li:fsd_update:(urn:li:activity:"), 20)
 		content := strings.ReplaceAll(post.Text, "\n", " ")
-		applicationLink := TruncateString(post.ActionTarget, 30)
-		if applicationLink == "" {
-			applicationLink = "N/A"
+		date := TruncateString(post.Date, 30) // Truncate date if it's too long
+		if date == "" {
+			date = "N/A"
+		}
+		actionTarget := TruncateString(post.ActionTarget, 30) // Truncate ActionTarget if it's too long
+		if actionTarget == "" {
+			actionTarget = "N/A"
 		}
 		table.Append([]string{
 			fmt.Sprintf("Post %d", i+1),
 			TruncateString(post.Name, 20),
-			TruncateString(content, 100), // Reduced to make room for the new column
+			TruncateString(content, 100),
 			fmt.Sprintf("%d", post.NumLikes),
 			fmt.Sprintf("%d", post.NumComments),
 			urn,
-			applicationLink,
+			date,
+			actionTarget,
 		})
 	}
 
@@ -105,3 +120,4 @@ func DisplayPosts(posts []models.PostRes) {
 
 	fmt.Printf("\nTotal posts extracted: %d\n", len(posts))
 }
+

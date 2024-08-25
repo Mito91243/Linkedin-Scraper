@@ -245,7 +245,7 @@ type PostRes struct {
     URN          string `json:"urn"`
     NumLikes     int    `json:"numLikes"`
     NumComments  int    `json:"numComments"`
-    Date         int64  `json:"date"` // Changed to int64 for Unix timestamp
+    Date         string `json:"date"` // Changed to string
 }
 
 type SocialCounts struct {

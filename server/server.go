@@ -68,7 +68,7 @@ func Start() {
 	fmt.Println(strings.Repeat("=", 60))
 	//! POSTS INCOMING STARTS HERE
 	postsQuery := utils.GetPostQuery(profiles, client)*/
-	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:intern,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(ACoAADwXNCYBtzPLExyaYOEM0hHjXeHpd7MaL1U,ACoAAAmld2YBPvssug9XG9y763pbsgi7j56hQPc,ACoAACRf_ZIBibwGD4VQxL9Zx0n_iMJB57VPB6M,ACoAAD3hBFgBTRqdorxET6iP1u6GurdfW_dQ1eo,ACoAAEGJrIMBkRe5-0-OEl_Rb-NK1TpdVhXnQq0,ACoAAAynTtoBw-ue8qwFuXT3qIf0o2Z4CmoH_XA,ACoAAAAHz04BwbOUX11qxZVM2S8XYgPEWPUY1i8,ACoAABtjpPMBERe5ucxfXBJObKkgLk-IcluhdPg,ACoAAAkQF2MBYKjgfpMP1tq1rkwONr-YIonlUtE,ACoAACt4tMoBBAIj7jjoyTqHpBAkYVfu9x4Nn4E,ACoAAEPcuv0Bzmerv9dDRc_-xMlGZynWCVwAVSw,ACoAAEI_ozEBL65Ml6qPqU8LC6dYv3o6Y-mqDbA,ACoAADOKBzcB1j23WG57I9TOPtbwLPQ6Xxy5x08,ACoAACE7YVoBhFoEOgA5Z-HRT-n_zGlZObm6Y2Y)),(key:resultType,value:List(CONTENT)),(key:sortBy,value:List(relevance)))),count:30)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
+	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:internship,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(ACoAAD0iHMkBAQgaS-WrZZgveP-SJ3xZmffaNoI,ACoAACNSJf0Bug6BuUyhDOLORhz1MNfi9F6Lt-k,ACoAACbZ-wIBaFbwH4K4Dr7MwGOpQLgHWevq6Qk,ACoAACwQ7zsBp5ie9D_GOl6YKuLDSVQGGm4KyKM,ACoAADCKL8YBTdz1DAcdjdhqBgAL9PyVWdsv9Qw,ACoAACbk0-gBoc1GMeV3vMrr8M7eUwAtK9GkvAw,ACoAADERV6ABjbMMVSBpJa8R17IuuLeEfn4aLO8)),(key:resultType,value:List(CONTENT)),(key:searchId,value:List(7d395167-cd5d-4772-8931-f56562831e0c)))),count:49)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
 
 	GetPosts(url, client)
 	fmt.Scanln()

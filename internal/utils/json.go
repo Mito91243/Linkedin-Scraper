@@ -8,6 +8,7 @@ import (
 	"main/internal/models"
 	"net/http"
 	"strings"
+    "regexp"
 )
 
 func Decoding(res *http.Response) []byte {
@@ -88,6 +89,9 @@ func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
     var posts []models.PostRes
     socialCounts := make(map[string]models.SocialCounts)
 
+    // Regular expression to find https:// links
+    linkRegex := regexp.MustCompile(`http://[^\s]+`)
+
     // First, extract all social activity counts
     for _, item := range resp.Included {
         if strings.Contains(item.EntityUrn, "socialActivityCounts") {
@@ -97,7 +101,6 @@ func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
                 NumLikes:    item.NumLikes,
                 NumComments: item.NumComments,
             }
-            fmt.Printf("Extracted social counts - ID: %s, Likes: %d, Comments: %d\n", id, item.NumLikes, item.NumComments)
         }
     }
 
@@ -108,42 +111,42 @@ func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
                 URN:  item.EntityUrn,
                 Name: item.Actor.Name.Text,
                 Text: item.Commentary.Text.Text,
+                Date: item.Actor.SubDescription.AccessibilityText,
             }
 
             if post.Text == "" && item.Content.ArticleComponent.Title.Text != "" {
                 post.Text = item.Content.ArticleComponent.Title.Text
             }
 
-            if item.Content.ArticleComponent.NavigationContext.ActionTarget != "" {
+            // Extract https:// link from the text
+            links := linkRegex.FindAllString(post.Text, -1)
+            if len(links) > 0 {
+                post.ActionTarget = links[0] // Store the first link found
+            }
+
+            // If no link found in the text, use the existing ActionTarget
+            if post.ActionTarget == "" && item.Content.ArticleComponent.NavigationContext.ActionTarget != "" {
                 post.ActionTarget = item.Content.ArticleComponent.NavigationContext.ActionTarget
             }
 
             // Match social counts using the shareUrn from metadata
             if item.Metadata.ShareUrn != "" {
                 shareID := extractID(item.Metadata.ShareUrn)
-                fmt.Printf("Trying to match shareID: %s\n", shareID)
                 if counts, ok := socialCounts[shareID]; ok {
                     post.NumLikes = counts.NumLikes
                     post.NumComments = counts.NumComments
-                    fmt.Printf("Found matching social counts - Likes: %d, Comments: %d\n", post.NumLikes, post.NumComments)
                 } else {
                     // Try matching with the activity ID from the entityUrn
                     activityID := extractActivityID(item.EntityUrn)
                     if counts, ok := socialCounts[activityID]; ok {
                         post.NumLikes = counts.NumLikes
                         post.NumComments = counts.NumComments
-                        fmt.Printf("Found matching social counts using activityID - Likes: %d, Comments: %d\n", post.NumLikes, post.NumComments)
-                    } else {
-                        fmt.Printf("No matching social counts found for shareID: %s or activityID: %s\n", shareID, activityID)
                     }
                 }
-            } else {
-                fmt.Printf("No shareUrn found in metadata for post\n")
             }
 
             if post.Name != "" && post.Text != "" {
                 posts = append(posts, post)
-                fmt.Printf("Added post to list - Name: %s, Likes: %d, Comments: %d\n", post.Name, post.NumLikes, post.NumComments)
             }
         }
     }

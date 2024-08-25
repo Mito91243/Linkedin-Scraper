@@ -40,9 +40,4 @@ func GetPostQuery(people []models.ProfileRes, client *http.Client) string {
 	fmt.Println()
 	return url
 }
-
-//https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:internship,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(ACoAADttcpsBxvTz1m-uBKP0JaSchHJGifSGGHY,ACoAACbk0-gBoc1GMeV3vMrr8M7eUwAtK9GkvAw)),(key:resultType,value:List(CONTENT)),(key:sortBy,value:List(relevance))),includeFiltersInResponse:false),count:3)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7
-//! Make Model for Job Post
-//! Api Call with all ID's
-//! Data text.text (string)// Reactions(Int) // OP name // Post link(string) // Comments (INt)
-//	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:internship,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(" + final + ")),(key:resultType,value:List(CONTENT)),(key:sortBy,value:List(relevance))),includeFiltersInResponse:false),count:3)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
+//	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:intern,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(ACoAADwXNCYBtzPLExyaYOEM0hHjXeHpd7MaL1U,ACoAAAmld2YBPvssug9XG9y763pbsgi7j56hQPc,ACoAACRf_ZIBibwGD4VQxL9Zx0n_iMJB57VPB6M,ACoAAD3hBFgBTRqdorxET6iP1u6GurdfW_dQ1eo,ACoAAEGJrIMBkRe5-0-OEl_Rb-NK1TpdVhXnQq0,ACoAAAynTtoBw-ue8qwFuXT3qIf0o2Z4CmoH_XA,ACoAAAAHz04BwbOUX11qxZVM2S8XYgPEWPUY1i8,ACoAABtjpPMBERe5ucxfXBJObKkgLk-IcluhdPg,ACoAAAkQF2MBYKjgfpMP1tq1rkwONr-YIonlUtE,ACoAACt4tMoBBAIj7jjoyTqHpBAkYVfu9x4Nn4E,ACoAAEPcuv0Bzmerv9dDRc_-xMlGZynWCVwAVSw,ACoAAEI_ozEBL65Ml6qPqU8LC6dYv3o6Y-mqDbA,ACoAADOKBzcB1j23WG57I9TOPtbwLPQ6Xxy5x08,ACoAACE7YVoBhFoEOgA5Z-HRT-n_zGlZObm6Y2Y)),(key:resultType,value:List(CONTENT)),(key:sortBy,value:List(relevance)))),count:10)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
