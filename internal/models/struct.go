@@ -239,12 +239,13 @@ type ProfileRes struct {
 }
 
 type PostRes struct {
-	Text         string `json:"text"`
-	Name         string `json:"name"`
-	ActionTarget string `json:"actionTarget"`
-	URN          string `json:"urn"`
-	NumLikes     int    `json:"numLikes"`
-	NumComments  int    `json:"numComments"`
+    Text         string `json:"text"`
+    Name         string `json:"name"`
+    ActionTarget string `json:"actionTarget"`
+    URN          string `json:"urn"`
+    NumLikes     int    `json:"numLikes"`
+    NumComments  int    `json:"numComments"`
+    Date         int64  `json:"date"` // Changed to int64 for Unix timestamp
 }
 
 type SocialCounts struct {

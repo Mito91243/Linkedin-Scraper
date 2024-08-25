@@ -79,60 +79,95 @@ func ExtractProfiles(jsonData []byte) ([]map[string]interface{}, error) {
 }
 
 func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
-	var resp models.Post
-	err := json.Unmarshal(jsonData, &resp)
-	if err != nil {
-		return nil, err
-	}
+    var resp models.Post
+    err := json.Unmarshal(jsonData, &resp)
+    if err != nil {
+        return nil, err
+    }
 
-	var posts []models.PostRes
-	socialCounts := make(map[string]models.PostRes)
-	seenURNs := make(map[string]bool)
+    var posts []models.PostRes
+    socialCounts := make(map[string]models.SocialCounts)
 
-	// First pass: collect social activity counts
-	for _, item := range resp.Included {
-		if strings.Contains(item.EntityUrn, "fsd_socialActivityCounts") {
-			urn := strings.TrimPrefix(item.Urn, "urn:li:activity:")
-			socialCounts[urn] = models.PostRes{
-				NumLikes:    item.NumLikes,
-				NumComments: item.NumComments,
-			}
-		}
-	}
+    // First, extract all social activity counts
+    for _, item := range resp.Included {
+        if strings.Contains(item.EntityUrn, "socialActivityCounts") {
+            urn := item.Urn
+            id := extractID(urn)
+            socialCounts[id] = models.SocialCounts{
+                NumLikes:    item.NumLikes,
+                NumComments: item.NumComments,
+            }
+            fmt.Printf("Extracted social counts - ID: %s, Likes: %d, Comments: %d\n", id, item.NumLikes, item.NumComments)
+        }
+    }
 
-	// Second pass: extract posts and merge with social counts
-	for _, item := range resp.Included {
-		if strings.Contains(item.EntityUrn, "fsd_update") && !strings.Contains(item.EntityUrn, "fsd_updateActions") {
-			urn := strings.TrimPrefix(item.EntityUrn, "urn:li:fsd_update:(urn:li:activity:")
-			urn = strings.Split(urn, ",")[0]
+    // Then, extract all posts and match with social counts
+    for _, item := range resp.Included {
+        if strings.Contains(item.EntityUrn, "fsd_update") {
+            post := models.PostRes{
+                URN:  item.EntityUrn,
+                Name: item.Actor.Name.Text,
+                Text: item.Commentary.Text.Text,
+            }
 
-			// Check if we've already seen this URN
-			if seenURNs[urn] {
-				continue
-			}
-			seenURNs[urn] = true
+            if post.Text == "" && item.Content.ArticleComponent.Title.Text != "" {
+                post.Text = item.Content.ArticleComponent.Title.Text
+            }
 
-			post := models.PostRes{
-				URN:          item.EntityUrn,
-				ActionTarget: item.Content.ArticleComponent.NavigationContext.ActionTarget,
-				Name:         item.Actor.Name.Text,
-				Text:         item.Commentary.Text.Text,
-			}
+            if item.Content.ArticleComponent.NavigationContext.ActionTarget != "" {
+                post.ActionTarget = item.Content.ArticleComponent.NavigationContext.ActionTarget
+            }
 
-			if post.Text == "" {
-				post.Text = item.Content.ArticleComponent.Title.Text
-			}
+            // Match social counts using the shareUrn from metadata
+            if item.Metadata.ShareUrn != "" {
+                shareID := extractID(item.Metadata.ShareUrn)
+                fmt.Printf("Trying to match shareID: %s\n", shareID)
+                if counts, ok := socialCounts[shareID]; ok {
+                    post.NumLikes = counts.NumLikes
+                    post.NumComments = counts.NumComments
+                    fmt.Printf("Found matching social counts - Likes: %d, Comments: %d\n", post.NumLikes, post.NumComments)
+                } else {
+                    // Try matching with the activity ID from the entityUrn
+                    activityID := extractActivityID(item.EntityUrn)
+                    if counts, ok := socialCounts[activityID]; ok {
+                        post.NumLikes = counts.NumLikes
+                        post.NumComments = counts.NumComments
+                        fmt.Printf("Found matching social counts using activityID - Likes: %d, Comments: %d\n", post.NumLikes, post.NumComments)
+                    } else {
+                        fmt.Printf("No matching social counts found for shareID: %s or activityID: %s\n", shareID, activityID)
+                    }
+                }
+            } else {
+                fmt.Printf("No shareUrn found in metadata for post\n")
+            }
 
-			if counts, ok := socialCounts[urn]; ok {
-				post.NumLikes = counts.NumLikes
-				post.NumComments = counts.NumComments
-			}
+            if post.Name != "" && post.Text != "" {
+                posts = append(posts, post)
+                fmt.Printf("Added post to list - Name: %s, Likes: %d, Comments: %d\n", post.Name, post.NumLikes, post.NumComments)
+            }
+        }
+    }
 
-			if post.Text != "" && post.Name != "" {
-				posts = append(posts, post)
-			}
-		}
-	}
+    return posts, nil
+}
 
-	return posts, nil
+func extractID(urn string) string {
+    parts := strings.Split(urn, ":")
+    if len(parts) > 0 {
+        return parts[len(parts)-1]
+    }
+    return ""
+}
+
+func extractActivityID(urn string) string {
+    start := strings.Index(urn, "activity:")
+    if start != -1 {
+        start += 9 // length of "activity:"
+        end := strings.Index(urn[start:], ",")
+        if end != -1 {
+            return urn[start : start+end]
+        }
+        return urn[start:]
+    }
+    return ""
 }
