@@ -82,12 +82,12 @@ func DisplayPosts(posts []models.PostRes) {
 
 	table.SetAutoWrapText(false)
 	table.SetColumnAlignment([]int{
-		tablewriter.ALIGN_LEFT, 
-		tablewriter.ALIGN_LEFT, 
-		tablewriter.ALIGN_LEFT, 
-		tablewriter.ALIGN_RIGHT, 
-		tablewriter.ALIGN_RIGHT, 
-		tablewriter.ALIGN_LEFT, 
+		tablewriter.ALIGN_LEFT,
+		tablewriter.ALIGN_LEFT,
+		tablewriter.ALIGN_LEFT,
+		tablewriter.ALIGN_RIGHT,
+		tablewriter.ALIGN_RIGHT,
+		tablewriter.ALIGN_LEFT,
 		tablewriter.ALIGN_LEFT,
 		tablewriter.ALIGN_LEFT,
 	})
@@ -120,4 +120,3 @@ func DisplayPosts(posts []models.PostRes) {
 
 	fmt.Printf("\nTotal posts extracted: %d\n", len(posts))
 }
-

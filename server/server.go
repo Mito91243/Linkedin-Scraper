@@ -9,7 +9,7 @@ import (
 	"main/internal/utils"
 	"net/http"
 	"strings"
-	//"time"
+	"time"
 )
 
 func Start() {
@@ -22,13 +22,14 @@ func Start() {
 	}
 
 	client := &http.Client{}
-	//companyName := utils.Read_input()
-	//start := time.Now()
-	/*companyIdchan := make(chan string)
+	companyName := utils.Read_input()
+	start := time.Now()
+	companyIdchan := make(chan string)
 	positionIdchan := make(chan string)
 	go func() {
 		companyID, _ := api.GetCompanyId(client, companyName)
 		companyIdchan <- companyID
+		//companyIdchan <- "3604171"
 	}()
 	go func() {
 		positionIdentifier := utils.ReadPositionInput()
@@ -67,10 +68,9 @@ func Start() {
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
 	fmt.Println(strings.Repeat("=", 60))
 	//! POSTS INCOMING STARTS HERE
-	postsQuery := utils.GetPostQuery(profiles, client)*/
-	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:internship,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List(ACoAAD0iHMkBAQgaS-WrZZgveP-SJ3xZmffaNoI,ACoAACNSJf0Bug6BuUyhDOLORhz1MNfi9F6Lt-k,ACoAACbZ-wIBaFbwH4K4Dr7MwGOpQLgHWevq6Qk,ACoAACwQ7zsBp5ie9D_GOl6YKuLDSVQGGm4KyKM,ACoAADCKL8YBTdz1DAcdjdhqBgAL9PyVWdsv9Qw,ACoAACbk0-gBoc1GMeV3vMrr8M7eUwAtK9GkvAw,ACoAADERV6ABjbMMVSBpJa8R17IuuLeEfn4aLO8)),(key:resultType,value:List(CONTENT)),(key:searchId,value:List(7d395167-cd5d-4772-8931-f56562831e0c)))),count:49)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
+	postsQuery := utils.GetPostQuery(profiles, client)
 
-	GetPosts(url, client)
+	GetPosts(postsQuery, client)
 	fmt.Scanln()
 }
 

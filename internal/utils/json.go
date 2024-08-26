@@ -7,8 +7,8 @@ import (
 	"io"
 	"main/internal/models"
 	"net/http"
+	"regexp"
 	"strings"
-    "regexp"
 )
 
 func Decoding(res *http.Response) []byte {
@@ -80,97 +80,97 @@ func ExtractProfiles(jsonData []byte) ([]map[string]interface{}, error) {
 }
 
 func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
-    var resp models.Post
-    err := json.Unmarshal(jsonData, &resp)
-    if err != nil {
-        return nil, err
-    }
+	var resp models.Post
+	err := json.Unmarshal(jsonData, &resp)
+	if err != nil {
+		return nil, err
+	}
 
-    var posts []models.PostRes
-    socialCounts := make(map[string]models.SocialCounts)
+	var posts []models.PostRes
+	socialCounts := make(map[string]models.SocialCounts)
 
-    // Regular expression to find https:// links
-    linkRegex := regexp.MustCompile(`http://[^\s]+`)
+	// Regular expression to find https:// links
+	linkRegex := regexp.MustCompile(`http://[^\s]+`)
 
-    // First, extract all social activity counts
-    for _, item := range resp.Included {
-        if strings.Contains(item.EntityUrn, "socialActivityCounts") {
-            urn := item.Urn
-            id := extractID(urn)
-            socialCounts[id] = models.SocialCounts{
-                NumLikes:    item.NumLikes,
-                NumComments: item.NumComments,
-            }
-        }
-    }
+	// First, extract all social activity counts
+	for _, item := range resp.Included {
+		if strings.Contains(item.EntityUrn, "socialActivityCounts") {
+			urn := item.Urn
+			id := extractID(urn)
+			socialCounts[id] = models.SocialCounts{
+				NumLikes:    item.NumLikes,
+				NumComments: item.NumComments,
+			}
+		}
+	}
 
-    // Then, extract all posts and match with social counts
-    for _, item := range resp.Included {
-        if strings.Contains(item.EntityUrn, "fsd_update") {
-            post := models.PostRes{
-                URN:  item.EntityUrn,
-                Name: item.Actor.Name.Text,
-                Text: item.Commentary.Text.Text,
-                Date: item.Actor.SubDescription.AccessibilityText,
-            }
+	// Then, extract all posts and match with social counts
+	for _, item := range resp.Included {
+		if strings.Contains(item.EntityUrn, "fsd_update") {
+			post := models.PostRes{
+				URN:  item.EntityUrn,
+				Name: item.Actor.Name.Text,
+				Text: item.Commentary.Text.Text,
+				Date: item.Actor.SubDescription.AccessibilityText,
+			}
 
-            if post.Text == "" && item.Content.ArticleComponent.Title.Text != "" {
-                post.Text = item.Content.ArticleComponent.Title.Text
-            }
+			if post.Text == "" && item.Content.ArticleComponent.Title.Text != "" {
+				post.Text = item.Content.ArticleComponent.Title.Text
+			}
 
-            // Extract https:// link from the text
-            links := linkRegex.FindAllString(post.Text, -1)
-            if len(links) > 0 {
-                post.ActionTarget = links[0] // Store the first link found
-            }
+			// Extract https:// link from the text
+			links := linkRegex.FindAllString(post.Text, -1)
+			if len(links) > 0 {
+				post.ActionTarget = links[0] // Store the first link found
+			}
 
-            // If no link found in the text, use the existing ActionTarget
-            if post.ActionTarget == "" && item.Content.ArticleComponent.NavigationContext.ActionTarget != "" {
-                post.ActionTarget = item.Content.ArticleComponent.NavigationContext.ActionTarget
-            }
+			// If no link found in the text, use the existing ActionTarget
+			if post.ActionTarget == "" && item.Content.ArticleComponent.NavigationContext.ActionTarget != "" {
+				post.ActionTarget = item.Content.ArticleComponent.NavigationContext.ActionTarget
+			}
 
-            // Match social counts using the shareUrn from metadata
-            if item.Metadata.ShareUrn != "" {
-                shareID := extractID(item.Metadata.ShareUrn)
-                if counts, ok := socialCounts[shareID]; ok {
-                    post.NumLikes = counts.NumLikes
-                    post.NumComments = counts.NumComments
-                } else {
-                    // Try matching with the activity ID from the entityUrn
-                    activityID := extractActivityID(item.EntityUrn)
-                    if counts, ok := socialCounts[activityID]; ok {
-                        post.NumLikes = counts.NumLikes
-                        post.NumComments = counts.NumComments
-                    }
-                }
-            }
+			// Match social counts using the shareUrn from metadata
+			if item.Metadata.ShareUrn != "" {
+				shareID := extractID(item.Metadata.ShareUrn)
+				if counts, ok := socialCounts[shareID]; ok {
+					post.NumLikes = counts.NumLikes
+					post.NumComments = counts.NumComments
+				} else {
+					// Try matching with the activity ID from the entityUrn
+					activityID := extractActivityID(item.EntityUrn)
+					if counts, ok := socialCounts[activityID]; ok {
+						post.NumLikes = counts.NumLikes
+						post.NumComments = counts.NumComments
+					}
+				}
+			}
 
-            if post.Name != "" && post.Text != "" {
-                posts = append(posts, post)
-            }
-        }
-    }
+			if post.Name != "" && post.Text != "" {
+				posts = append(posts, post)
+			}
+		}
+	}
 
-    return posts, nil
+	return posts, nil
 }
 
 func extractID(urn string) string {
-    parts := strings.Split(urn, ":")
-    if len(parts) > 0 {
-        return parts[len(parts)-1]
-    }
-    return ""
+	parts := strings.Split(urn, ":")
+	if len(parts) > 0 {
+		return parts[len(parts)-1]
+	}
+	return ""
 }
 
 func extractActivityID(urn string) string {
-    start := strings.Index(urn, "activity:")
-    if start != -1 {
-        start += 9 // length of "activity:"
-        end := strings.Index(urn[start:], ",")
-        if end != -1 {
-            return urn[start : start+end]
-        }
-        return urn[start:]
-    }
-    return ""
+	start := strings.Index(urn, "activity:")
+	if start != -1 {
+		start += 9 // length of "activity:"
+		end := strings.Index(urn[start:], ",")
+		if end != -1 {
+			return urn[start : start+end]
+		}
+		return urn[start:]
+	}
+	return ""
 }

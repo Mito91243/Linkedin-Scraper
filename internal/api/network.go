@@ -108,3 +108,4 @@ func GetReqGoogle(url string, client *http.Client) string {
 
 	return string(bodyBytes)
 }
+
