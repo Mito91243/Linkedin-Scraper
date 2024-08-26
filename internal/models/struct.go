@@ -230,6 +230,14 @@ type Profile struct {
 	} `json:"included"`
 }
 
+type Response struct {
+	Data struct {
+		Included []struct {
+			EntityUrn string `json:"entityUrn"`
+		} `json:"included"`
+	} `json:"data"`
+}
+
 type ProfileRes struct {
 	FullName   string `json:"fullName"`
 	LastName   string `json:"lastName"`

@@ -38,10 +38,10 @@ func GetPostQuery(people []models.ProfileRes, client *http.Client) string {
 		final += temp
 	}
 	final = final[:len(final)-1]
-	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:job,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List("+final+")),(key:resultType,value:List(CONTENT))),includeFiltersInResponse:false),count:48)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
-	fmt.Println()
-	fmt.Print(url)
-	fmt.Println()
+	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:internship,flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:fromMember,value:List("+final+")),(key:resultType,value:List(CONTENT))),includeFiltersInResponse:false),count:48)&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
+	//fmt.Println()
+	//fmt.Print(url)
+	//fmt.Println()
 	return url
 }
 

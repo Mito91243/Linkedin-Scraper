@@ -174,3 +174,23 @@ func extractActivityID(urn string) string {
 	}
 	return ""
 }
+
+
+func ExtractCompanyID(jsonData []byte) string {
+	var response models.Response
+	err := json.Unmarshal(jsonData, &response)
+	if err != nil {
+		return ""
+	}
+
+	for _, item := range response.Data.Included {
+		if strings.Contains(item.EntityUrn, "urn:li:fsd_company:") {
+			parts := strings.Split(item.EntityUrn, ":")
+			if len(parts) > 0 {
+				return parts[len(parts)-1]
+			}
+		}
+	}
+
+	return ""
+}

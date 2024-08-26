@@ -2,14 +2,14 @@ package server
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 	"main/internal/api"
 	"main/internal/models"
 	"main/internal/utils"
 	"net/http"
 	"strings"
 	"time"
+	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 )
 
 func Start() {
@@ -27,9 +27,12 @@ func Start() {
 	companyIdchan := make(chan string)
 	positionIdchan := make(chan string)
 	go func() {
-		companyID, _ := api.GetCompanyId(client, companyName)
-		companyIdchan <- companyID
-		//companyIdchan <- "3604171"
+		CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:ENTITY_SEARCH_HOME_HISTORY,query:(keywords:"+companyName+",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:heroEntityKey,value:List(urn%3Ali%3Aorganization%3A3604171)),(key:isPrefetch,value:List(true)),(key:resultType,value:List(ALL))),includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
+		body,status := api.GetReq(CompanyURL,client)
+		if status != 200 {
+			fmt.Printf("Error Fetching Company URL: %v",status)
+		}
+		companyIdchan <- utils.ExtractCompanyID(body)
 	}()
 	go func() {
 		positionIdentifier := utils.ReadPositionInput()

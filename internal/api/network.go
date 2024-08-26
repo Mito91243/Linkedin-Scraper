@@ -2,12 +2,12 @@ package api
 
 import (
 	"fmt"
-	"io"
+	//"io"
 	"main/internal/utils"
 	"net/http"
 	"os"
-	"regexp"
-	"strings"
+	//"regexp"
+	//"strings"
 )
 
 func GetReq(url string, client *http.Client) ([]byte, int) {
@@ -48,6 +48,7 @@ func GetReq(url string, client *http.Client) ([]byte, int) {
 	return body, res.StatusCode
 }
 
+/*
 func GetCompanyName(client *http.Client, inputCompany string) string {
 	url := "https://www.google.com/search?q=" + inputCompany + "+linkedin"
 	bodyString := GetReqGoogle(url, client)
@@ -108,4 +109,4 @@ func GetReqGoogle(url string, client *http.Client) string {
 
 	return string(bodyBytes)
 }
-
+*/
