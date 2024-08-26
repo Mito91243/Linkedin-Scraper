@@ -90,7 +90,7 @@ func ExtractPosts(jsonData []byte) ([]models.PostRes, error) {
 	socialCounts := make(map[string]models.SocialCounts)
 
 	// Regular expression to find https:// links
-	linkRegex := regexp.MustCompile(`http://[^\s]+`)
+	linkRegex := regexp.MustCompile(`https://[^\s]+`)
 
 	// First, extract all social activity counts
 	for _, item := range resp.Included {
