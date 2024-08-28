@@ -175,7 +175,6 @@ func extractActivityID(urn string) string {
 	return ""
 }
 
-
 func ExtractCompanyID(jsonData []byte) string {
 	var data map[string]interface{}
 	err := json.Unmarshal(jsonData, &data)
