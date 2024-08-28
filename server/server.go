@@ -1,11 +1,12 @@
 package server
 
 import (
-	"log"
+	//"log"
 	//"net/http"
+	"main/config"
 )
 
-func Start(errorLog, infoLog *log.Logger) {
+func Start(app *config.Application) {
 	//mux := http.NewServeMux()
 	//mux.HandleFunc("/", home)
 	//mux.HandleFunc("/post/view", postview)
