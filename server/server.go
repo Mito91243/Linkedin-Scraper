@@ -27,12 +27,16 @@ func Start() {
 	companyIdchan := make(chan string)
 	positionIdchan := make(chan string)
 	go func() {
-		CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:ENTITY_SEARCH_HOME_HISTORY,query:(keywords:"+companyName+",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:heroEntityKey,value:List(urn%3Ali%3Aorganization%3A3604171)),(key:isPrefetch,value:List(true)),(key:resultType,value:List(ALL))),includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters.a2b606e8c1f58b3cf72fb5d54a2a57e7"
+		CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(query:"+companyName+")&queryId=voyagerSearchDashTypeahead.5d388aa0c61a43e1dcd14aaa52fe062c"
+		//fmt.Printf(" COMAPNY URL IS : %v\n",CompanyURL)
 		body,status := api.GetReq(CompanyURL,client)
 		if status != 200 {
 			fmt.Printf("Error Fetching Company URL: %v",status)
 		}
-		companyIdchan <- utils.ExtractCompanyID(body)
+		//fmt.Print(string(body))
+		id := utils.ExtractCompanyID(body)
+		//fmt.Printf("ID OF THE COMPANY IS : %v ", id)
+		companyIdchan <-id
 	}()
 	go func() {
 		positionIdentifier := utils.ReadPositionInput()
@@ -71,9 +75,17 @@ func Start() {
 	fmt.Printf("✨ Total Time To Fetch Profiles: %.2f seconds\n", time.Since(start).Seconds())
 	fmt.Println(strings.Repeat("=", 60))
 	//! POSTS INCOMING STARTS HERE
-	postsQuery := utils.GetPostQuery(profiles, client)
 
-	GetPosts(postsQuery, client)
+	posturls := []string{}
+
+	keyword := utils.Read_KeyWord()
+	utils.GetPostQuery(profiles,keyword, &posturls)
+	if len(posturls) < 1 {
+		fmt.Print("DIDNT PARSE ANY")
+		return
+	}
+	posts := GetPosts(posturls, client)
+	utils.DisplayPosts(posts)
 	fmt.Scanln()
 }
 
@@ -117,15 +129,23 @@ func Run(companyName string, url string, client *http.Client) []models.ProfileRe
 	return profiles
 }
 
-func GetPosts(url string, client *http.Client) {
-	body, status := api.GetReq(url, client)
-	results, err := utils.ExtractPosts(body)
-
-	if err != nil {
-		fmt.Printf("Error extracting posts: %v\n", err)
-		return
+func GetPosts(urls []string, client *http.Client) []models.PostRes {
+	var posts []models.PostRes
+	for _,url := range urls {
+		body, status := api.GetReq(url, client)
+		results, err := utils.ExtractPosts(body)
+	
+		if err != nil {
+			fmt.Printf("Error extracting posts: %v\n", err)
+			return nil
+		}
+	
+		fmt.Printf("Posts Status: %d\n", status)
+		posts = append(posts, results...)
 	}
-
-	fmt.Printf("Status: %d\n\n", status)
-	utils.DisplayPosts(results)
+	return posts
 }
+
+
+
+//! Get All posts not only 24 people

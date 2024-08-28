@@ -177,17 +177,42 @@ func extractActivityID(urn string) string {
 
 
 func ExtractCompanyID(jsonData []byte) string {
-	var response models.Response
-	err := json.Unmarshal(jsonData, &response)
+	var data map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
 		return ""
 	}
 
-	for _, item := range response.Data.Included {
-		if strings.Contains(item.EntityUrn, "urn:li:fsd_company:") {
-			parts := strings.Split(item.EntityUrn, ":")
-			if len(parts) > 0 {
-				return parts[len(parts)-1]
+	included, ok := data["included"].([]interface{})
+	if !ok {
+		return ""
+	}
+
+	for _, item := range included {
+		obj, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		// Check entityUrn field
+		if entityUrn, ok := obj["entityUrn"].(string); ok {
+			re := regexp.MustCompile(`(?:fsd_company|company):(\d+)`)
+			match := re.FindStringSubmatch(entityUrn)
+			if len(match) > 1 {
+				return match[1]
+			}
+		}
+
+		// Check $type field
+		if typeField, ok := obj["$type"].(string); ok {
+			if strings.Contains(typeField, "FollowingState") {
+				if entityUrn, ok := obj["preDashFollowingInfoUrn"].(string); ok {
+					re := regexp.MustCompile(`company:(\d+)`)
+					match := re.FindStringSubmatch(entityUrn)
+					if len(match) > 1 {
+						return match[1]
+					}
+				}
 			}
 		}
 	}

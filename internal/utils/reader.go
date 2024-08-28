@@ -101,3 +101,30 @@ func ReadPositionInput() string {
 	}
 	return "12"
 }
+
+func Read_KeyWord() string {
+	scanner := bufio.NewScanner(os.Stdin)
+
+	fmt.Print("📝 Enter Keywords To look for chained together ',' : ")
+
+	for scanner.Scan() {
+		text := scanner.Text()
+		if text == "" {
+			fmt.Println("❌ Empty input. Please try again.")
+			fmt.Print("📝 Enter Company Name: ")
+
+		} else {
+			text = strings.Replace(text, " ", "+", 3)
+			return strings.ToLower(text)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("❗ Error:", err)
+	}
+
+	fmt.Println("❌ No valid input received.")
+	fmt.Println(strings.Repeat("-", 60))
+	return ""
+
+}
