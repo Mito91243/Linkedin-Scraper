@@ -3,23 +3,17 @@ package cmd
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/joho/godotenv"
+	"main/config"
 	"main/internal/api"
 	"main/internal/models"
 	"main/internal/utils"
 	"strings"
 	"time"
-	"main/config"
 )
 
 func Start(app *config.Application) {
 	utils.PrintHeader()
-	err := godotenv.Load("./.env")
-	if err != nil {
-		fmt.Print(err)
-		fmt.Println("❌ Error loading .env file")
-		return
-	}
+
 
 	companyName := utils.Read_input()
 	start := time.Now()
@@ -52,10 +46,10 @@ func Start(app *config.Application) {
 	firstPatch := make(chan []models.ProfileRes)
 	SecondPatch := make(chan []models.ProfileRes)
 	go func() {
-		firstPatch <- Run(companyName, url,app)
+		firstPatch <- Run(companyName, url, app)
 	}()
 	go func() {
-		SecondPatch <- Run(companyName, url2,app)
+		SecondPatch <- Run(companyName, url2, app)
 	}()
 	profiles := <-firstPatch
 	profiles2 := <-SecondPatch
@@ -64,7 +58,7 @@ func Start(app *config.Application) {
 	// Get Talent Acquisition personnel
 	if positionIdentifier == "12" {
 		urlTalentAcquisition := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:Talent%20acquisition,flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.ff737c692102a8ce842be8f129f834ae"
-		profilesExtended := Run(companyName, urlTalentAcquisition,app)
+		profilesExtended := Run(companyName, urlTalentAcquisition, app)
 		profiles = append(profiles, profilesExtended...)
 	}
 	utils.DisplayProfiles(profiles)
