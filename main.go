@@ -6,7 +6,7 @@ import (
 	"log"
 	"main/cmd"
 	"main/config"
-	"main/server"
+	"main/internal/web"
 	"net/http"
 	"os"
 	"time"
@@ -35,7 +35,7 @@ func main() {
 
 	// Setting mode to launch while sending loggers to files
 	if *mode == "prod" {
-		server.Start(app)
+		web.Start()
 	} else {
 		cmd.Start(app)
 	}

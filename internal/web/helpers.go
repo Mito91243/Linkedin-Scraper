@@ -14,7 +14,7 @@ import (
 
 // The serverError helper writes an error message and stack trace to the errorLog,
 // then sends a generic 500 Internal Server Error response to the user.
-func serverError(w http.ResponseWriter, err error, app *config.Application) {
+func (app *Application) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	app.ErrorLog.Print(trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -23,22 +23,27 @@ func serverError(w http.ResponseWriter, err error, app *config.Application) {
 // The clientError helper sends a specific status code and corresponding description
 // to the user. We'll use this later in the book to send responses like 400 "Bad
 // Request" when there's a problem with the request that the user sent.
-func clientError(w http.ResponseWriter, status int) {
+func (app *Application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
 // For consistency, we'll also implement a notFound helper. This is simply a
 // convenience wrapper around clientError which sends a 404 Not Found response to
 // the user.
-func notFound(w http.ResponseWriter) {
-	clientError(w, http.StatusNotFound)
+func (app *Application) notFound(w http.ResponseWriter) {
+	app.clientError(w, http.StatusNotFound)
 }
 
-func getAllProfiles(position string, companyName string, app *config.Application) []byte {
+func (app *Application) getAllProfiles(position string, companyName string) []byte {
+	Ap := &config.Application{
+		InfoLog:  app.InfoLog,
+		ErrorLog: app.ErrorLog,
+		Client:   app.Client,
+	}
 
 	CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(query:" + companyName + ")&queryId=voyagerSearchDashTypeahead.5d388aa0c61a43e1dcd14aaa52fe062c"
 
-	body, status := api.GetReq(CompanyURL, app)
+	body, status := api.GetReq(CompanyURL, Ap)
 	if status != 200 {
 		app.ErrorLog.Printf("Error Fetching Company URL: %v", status)
 	}
@@ -53,10 +58,10 @@ func getAllProfiles(position string, companyName string, app *config.Application
 	SecondPatch := make(chan []models.ProfileRes)
 
 	go func() {
-		firstPatch <- getProfiles(companyName, url, app)
+		firstPatch <- app.getProfiles(companyName, url, Ap)
 	}()
 	go func() {
-		SecondPatch <- getProfiles(companyName, url2, app)
+		SecondPatch <- app.getProfiles(companyName, url2, Ap)
 	}()
 	profiles := <-firstPatch
 	profiles2 := <-SecondPatch
@@ -64,7 +69,7 @@ func getAllProfiles(position string, companyName string, app *config.Application
 
 	// Get Talent Acquisition personnel
 	if position == "12" {
-		profilesExtended := getProfiles(companyName, urlTalentAcquisition, app)
+		profilesExtended := app.getProfiles(companyName, urlTalentAcquisition, Ap)
 		profiles = append(profiles, profilesExtended...)
 	}
 	jsonData, err := json.Marshal(profiles)
@@ -76,9 +81,9 @@ func getAllProfiles(position string, companyName string, app *config.Application
 	return jsonData
 }
 
-func getProfiles(companyName string, url string, app *config.Application) []models.ProfileRes {
+func (app *Application) getProfiles(companyName string, url string, Ap *config.Application) []models.ProfileRes {
 
-	body, status := api.GetReq(url, app)
+	body, status := api.GetReq(url, Ap)
 
 	if status != 200 {
 		app.ErrorLog.Printf("Error Getting Profiles: %v", status)

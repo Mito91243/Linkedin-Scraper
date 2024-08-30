@@ -1,36 +1,34 @@
 package web
 
 import (
-	//"encoding/json"
-	"main/config"
 	"net/http"
-	//"time"
-	//"main/cmd"
 )
 
-func Home(app *config.Application) http.HandlerFunc {
+func (app *Application) Home() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		//panic("oops! something went wrong")
+
 		if r.URL.Path != "/" {
-			notFound(w)
+			app.notFound(w)
 			return
 		}
 		w.Write([]byte("Zeby manga"))
 	}
 }
 
-func Postsviewall(app *config.Application) http.HandlerFunc {
+func (app *Application) Postsviewall() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 	}
 }
 
-func Profilesviewall(app *config.Application) http.HandlerFunc {
+func (app *Application) Profilesviewall() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*") // In production, set this to your frontend's origin
 		//start := time.Now()
 		company := r.URL.Query().Get("company")
 		category := r.URL.Query().Get("category")
-		jsonData := getAllProfiles(category, company, app)
+		jsonData := app.getAllProfiles(category, company)
 		w.Header().Set("Content-Type", "application/json")
 
 		w.WriteHeader(http.StatusOK)
@@ -39,7 +37,7 @@ func Profilesviewall(app *config.Application) http.HandlerFunc {
 			// Log the error
 			app.ErrorLog.Printf("Error writing response: %v", err)
 			// Optionally, you could also set an error status code here
-			serverError(w, err, app)
+			app.serverError(w, err)
 			return
 		}
 		//app.InfoLog.Printf("Profileviewall Request Finished in %.2f seconds :  \n", time.Since(start).Seconds())
