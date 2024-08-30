@@ -4,8 +4,8 @@ type ProfileRes struct {
 	FullName   string `json:"fullName"`
 	LastName   string `json:"lastName"`
 	Position   string `json:"position"`
-	ProfileURN string `json:"profileURN"`
-	Link       string `json:"bserpEntityNavigationalUrl"`
+	ProfileURN string `json:"Email"`
+	Link       string `json:"Link"`
 }
 
 type PostRes struct {

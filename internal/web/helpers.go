@@ -43,22 +43,11 @@ func getAllProfiles(position string, companyName string, app *config.Application
 		app.ErrorLog.Printf("Error Fetching Company URL: %v", status)
 	}
 	id := utils.ExtractCompanyID(body)
-	app.InfoLog.Printf("Company ID : %v ", id)
+	//app.InfoLog.Printf("Company ID : %v ", id)
 
-	//! Switch Cases for the postitions 
-	//? 12 -> Human Resources personnel
-	//? 8 -> Engineers
-	//? 18 -> Program Managers
-	//? 24 -> Researchers
-	//? 13 -> IT Personnel
-
-	companyID := "1035"
-
-	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + position + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
-
-	url2 := "https://www.linkedin.com/voyager/api/graphql?variables=(start:49,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:currentFunction,value:List(" + position + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
-
-	urlTalentAcquisition := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:Talent%20acquisition,flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + companyID + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.ff737c692102a8ce842be8f129f834ae"
+	url := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + id + ")),(key:currentFunction,value:List(" + position + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
+	url2 := "https://www.linkedin.com/voyager/api/graphql?variables=(start:49,origin:FACETED_SEARCH,query:(flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + id + ")),(key:currentFunction,value:List(" + position + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.2e313ab8de30ca45e1c025cd0cfc6199"
+	urlTalentAcquisition := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:FACETED_SEARCH,query:(keywords:Talent%20acquisition,flagshipSearchIntent:ORGANIZATIONS_PEOPLE_ALUMNI,queryParameters:List((key:currentCompany,value:List(" + id + ")),(key:geoUrn,value:List(106155005)),(key:resultType,value:List(ORGANIZATION_ALUMNI))),includeFiltersInResponse:true),count:49)&queryId=voyagerSearchDashClusters.ff737c692102a8ce842be8f129f834ae"
 
 	firstPatch := make(chan []models.ProfileRes)
 	SecondPatch := make(chan []models.ProfileRes)
@@ -78,12 +67,13 @@ func getAllProfiles(position string, companyName string, app *config.Application
 		profilesExtended := getProfiles(companyName, urlTalentAcquisition, app)
 		profiles = append(profiles, profilesExtended...)
 	}
-	jsonData,err := json.Marshal(profiles)
+	jsonData, err := json.Marshal(profiles)
 	if err != nil {
 		fmt.Println("Error Marshalling to Json")
 	}
+	app.InfoLog.Printf("Profile Fetched :  %d", len(profiles))
+
 	return jsonData
-	//! Do some logic here to send the profiles to the frontend
 }
 
 func getProfiles(companyName string, url string, app *config.Application) []models.ProfileRes {

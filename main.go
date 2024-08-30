@@ -2,18 +2,17 @@ package main
 
 import (
 	"flag"
+	"github.com/joho/godotenv"
 	"log"
 	"main/cmd"
 	"main/config"
 	"main/server"
 	"net/http"
-	"github.com/joho/godotenv"
 	"os"
 	"time"
 )
 
 func main() {
-
 
 	//Setting Dev Mode
 	mode := flag.String("m", "prod", "Enviroment Mode")
@@ -28,11 +27,11 @@ func main() {
 		},
 	}
 
-		err := godotenv.Load("./.env")
-		if err != nil {
-			app.ErrorLog.Printf("Error Loading .env")
-			return
-		}
+	err := godotenv.Load("./.env")
+	if err != nil {
+		app.ErrorLog.Printf("Error Loading .env")
+		return
+	}
 
 	// Setting mode to launch while sending loggers to files
 	if *mode == "prod" {

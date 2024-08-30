@@ -12,73 +12,73 @@ import (
 )
 
 func GetReq(url string, app *config.Application) ([]byte, int) {
-    startTime := time.Now()
+	startTime := time.Now()
 
-    req, err := http.NewRequest("GET", url, nil)
-    if err != nil {
-        app.ErrorLog.Printf("Error creating request for %s: %v", url, err)
-        return nil, 0
-    }
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		app.ErrorLog.Printf("Error creating request for %s: %v", url, err)
+		return nil, 0
+	}
 
-    // Headers setup (unchanged)
-    req.Header.Add("accept", "application/vnd.linkedin.normalized+json+2.1")
-    req.Header.Add("accept-encoding", "gzip, deflate, br, zstd")
-    req.Header.Add("accept-language", "en-GB,en-US;q=0.9,en;q=0.8")
-    req.Header.Add("Csrf-Token", os.Getenv("csrf"))
-    req.Header.Add("priority", "u=1, i")
-    req.Header.Add("sec-ch-ua", "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
-    req.Header.Add("sec-ch-ua-mobile", "?0")
-    req.Header.Add("sec-ch-ua-platform", "\"Windows\"")
-    req.Header.Add("sec-fetch-dest", "empty")
-    req.Header.Add("sec-fetch-mode", "cors")
-    req.Header.Add("sec-fetch-site", "same-origin")
-    req.Header.Add("x-li-lang", "en_US")
-    req.Header.Add("x-li-pem-metadata", "Voyager - Organization - Member=organization-people-card")
-    req.Header.Add("x-li-track", "{\"clientVersion\":\"1.13.19196\",\"mpVersion\":\"1.13.19196\",\"osName\":\"web\",\"timezoneOffset\":1,\"timezone\":\"Europe/London\",\"deviceFormFactor\":\"DESKTOP\",\"mpName\":\"voyager-web\",\"displayDensity\":1,\"displayWidth\":1920,\"displayHeight\":1080}")
-    req.Header.Add("x-restli-protocol-version", "2.0.0")
-    req.Header.Add("Cookie", os.Getenv("cookie"))
-    req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+	// Headers setup (unchanged)
+	req.Header.Add("accept", "application/vnd.linkedin.normalized+json+2.1")
+	req.Header.Add("accept-encoding", "gzip, deflate, br, zstd")
+	req.Header.Add("accept-language", "en-GB,en-US;q=0.9,en;q=0.8")
+	req.Header.Add("Csrf-Token", os.Getenv("csrf"))
+	req.Header.Add("priority", "u=1, i")
+	req.Header.Add("sec-ch-ua", "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+	req.Header.Add("sec-ch-ua-mobile", "?0")
+	req.Header.Add("sec-ch-ua-platform", "\"Windows\"")
+	req.Header.Add("sec-fetch-dest", "empty")
+	req.Header.Add("sec-fetch-mode", "cors")
+	req.Header.Add("sec-fetch-site", "same-origin")
+	req.Header.Add("x-li-lang", "en_US")
+	req.Header.Add("x-li-pem-metadata", "Voyager - Organization - Member=organization-people-card")
+	req.Header.Add("x-li-track", "{\"clientVersion\":\"1.13.19196\",\"mpVersion\":\"1.13.19196\",\"osName\":\"web\",\"timezoneOffset\":1,\"timezone\":\"Europe/London\",\"deviceFormFactor\":\"DESKTOP\",\"mpName\":\"voyager-web\",\"displayDensity\":1,\"displayWidth\":1920,\"displayHeight\":1080}")
+	req.Header.Add("x-restli-protocol-version", "2.0.0")
+	req.Header.Add("Cookie", os.Getenv("cookie"))
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 
-    //! Log request headers
-    /*app.InfoLog.Printf("Request Headers for %s:", url)
-    for name, values := range req.Header {
-        for _, value := range values {
-            app.InfoLog.Printf("%s: %s", name, value)
-        }
-    }*/
+	//! Log request headers
+	/*app.InfoLog.Printf("Request Headers for %s:", url)
+	  for name, values := range req.Header {
+	      for _, value := range values {
+	          app.InfoLog.Printf("%s: %s", name, value)
+	      }
+	  }*/
 	//app.InfoLog.Printf("Now Executing %s: ", url)
 
-    res, err := app.Client.Do(req)
-    if err != nil {
-        app.ErrorLog.Printf("Error executing request for %s: %v", url, err)
-        return nil, 0
-    }
-    defer res.Body.Close()
+	res, err := app.Client.Do(req)
+	if err != nil {
+		app.ErrorLog.Printf("Error executing request for %s: %v", url, err)
+		return nil, 0
+	}
+	defer res.Body.Close()
 
-    body := utils.Decoding(res)
-    duration := time.Since(startTime)
-    url = strings.Split(url, "&queryId")[0]
-    logMessage := fmt.Sprintf("URL: %s | Status: %d | Time: %d ms", url, res.StatusCode, duration.Milliseconds())
+	body := utils.Decoding(res)
+	duration := time.Since(startTime)
+	url = strings.Split(url, "&queryId")[0]
+	logMessage := fmt.Sprintf("URL: %s | Status: %d | Time: %d ms", url, res.StatusCode, duration.Milliseconds())
 
 	// If response status code is not 200 get all headers
-    if res.StatusCode != http.StatusOK {
-        app.ErrorLog.Printf("Request failed: %s", logMessage)
-        
-        // Log response headers
-        app.ErrorLog.Printf("Response Headers:")
-        for name, values := range res.Header {
-            for _, value := range values {
-                app.ErrorLog.Printf("%s: %s", name, value)
-            }
-        }
-        
-        // Log response body
-        app.ErrorLog.Printf("Response Body: %s", string(body))
-    } else {
-        app.InfoLog.Printf("Request successful: %s", logMessage)
-    }
+	if res.StatusCode != http.StatusOK {
+		app.ErrorLog.Printf("Request failed: %s", logMessage)
 
-    return body, res.StatusCode
+		// Log response headers
+		app.ErrorLog.Printf("Response Headers:")
+		for name, values := range res.Header {
+			for _, value := range values {
+				app.ErrorLog.Printf("%s: %s", name, value)
+			}
+		}
+
+		// Log response body
+		//app.ErrorLog.Printf("Response Body: %s", string(body))
+	} else {
+		app.InfoLog.Printf("Request successful: %s", logMessage)
+	}
+
+	return body, res.StatusCode
 }
 
 /*

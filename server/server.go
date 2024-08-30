@@ -8,19 +8,23 @@ import (
 )
 
 func Start(app *config.Application) {
+
+	srv := &http.Server{
+		Addr:     ":80",
+		ErrorLog: app.ErrorLog,
+		Handler:  routes(app),
+	}
+
+	app.InfoLog.Printf("Starting server on 4040")
+	err := srv.ListenAndServe()
+	app.ErrorLog.Fatal(err)
+}
+
+func routes(app *config.Application) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", web.Home(app))
 	mux.HandleFunc("/post/viewall", web.Postsviewall(app))
-	mux.HandleFunc("/profile/viewall", web.Profilesviewall(app))
+	mux.HandleFunc("/profiles/view", web.Profilesviewall(app))
 	//log.Print(starting)
-
-	srv := &http.Server{
-		Addr: ":4040",
-		ErrorLog: app.ErrorLog,
-		Handler: mux,
-		}
-		app.InfoLog.Printf("Starting server on 4040")
-		err := srv.ListenAndServe()
-		app.ErrorLog.Fatal(err)
-	}
-
+	return web.MWlogRequest(web.MWsecureHeaders(mux))
+}

@@ -14,7 +14,6 @@ import (
 func Start(app *config.Application) {
 	utils.PrintHeader()
 
-
 	companyName := utils.Read_input()
 	start := time.Now()
 	companyIdchan := make(chan string)
