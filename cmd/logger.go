@@ -1,4 +1,4 @@
-package utils
+package cmd
 
 import (
 	"fmt"
@@ -119,4 +119,10 @@ func DisplayPosts(posts []models.PostRes) {
 	table.Render()
 
 	fmt.Printf("\nTotal posts extracted: %d\n", len(posts))
+}
+func TruncateString(s string, maxLength int) string {
+	if len(s) > maxLength {
+		return s[:maxLength-3] + "..."
+	}
+	return s
 }
