@@ -19,7 +19,7 @@ func Start(app *config.Application) {
 	companyIdchan := make(chan string)
 	positionIdchan := make(chan string)
 	go func() {
-		CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:RICH_QUERY_TYPEAHEAD_HISTORY,query:(keywords:"+companyName+",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:heroEntityKey,value:List(urn%3Ali%3Aorganization%3A18057791)),(key:position,value:List(0)),(key:resultType,value:List(ALL)),(key:searchId,value:List(7f9942a4-3ddc-46ad-8d2e-e134c5d766e7)),(key:spellCorrectionEnabled,value:List(true))),includeFiltersInResponse:false,spellCorrectionEnabled:true,clientSearchId:8c0cd58c-c063-4477-9491-f25888b7987c))&queryId=voyagerSearchDashClusters.b67807cb32b49b40ee7d5f5e2310d071"
+		CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:RICH_QUERY_TYPEAHEAD_HISTORY,query:(keywords:" + companyName + ",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:heroEntityKey,value:List(urn%3Ali%3Aorganization%3A18057791)),(key:position,value:List(0)),(key:resultType,value:List(ALL)),(key:searchId,value:List(7f9942a4-3ddc-46ad-8d2e-e134c5d766e7)),(key:spellCorrectionEnabled,value:List(true))),includeFiltersInResponse:false,spellCorrectionEnabled:true,clientSearchId:8c0cd58c-c063-4477-9491-f25888b7987c))&queryId=voyagerSearchDashClusters.b67807cb32b49b40ee7d5f5e2310d071"
 		body, status := api.GetReq(CompanyURL, app)
 		if status != 200 {
 			fmt.Printf("Error Fetching Company URL: %v", status)
