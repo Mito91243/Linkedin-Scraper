@@ -175,7 +175,6 @@ func extractActivityID(urn string) string {
 	return ""
 }
 
-
 func ExtractCompanyID(jsonData []byte) string {
 	var data map[string]interface{}
 	err := json.Unmarshal(jsonData, &data)
@@ -188,6 +187,9 @@ func ExtractCompanyID(jsonData []byte) string {
 		return ""
 	}
 
+	// Compile the regex pattern once
+	re := regexp.MustCompile(`(?:fsd_company|company):(\d+)`)
+
 	for _, item := range included {
 		obj, ok := item.(map[string]interface{})
 		if !ok {
@@ -196,23 +198,17 @@ func ExtractCompanyID(jsonData []byte) string {
 
 		// Check entityUrn field
 		if entityUrn, ok := obj["entityUrn"].(string); ok {
-			re := regexp.MustCompile(`(?:fsd_company|company):(\d+)`)
 			match := re.FindStringSubmatch(entityUrn)
 			if len(match) > 1 {
 				return match[1]
 			}
 		}
 
-		// Check $type field
-		if typeField, ok := obj["$type"].(string); ok {
-			if strings.Contains(typeField, "FollowingState") {
-				if entityUrn, ok := obj["preDashFollowingInfoUrn"].(string); ok {
-					re := regexp.MustCompile(`company:(\d+)`)
-					match := re.FindStringSubmatch(entityUrn)
-					if len(match) > 1 {
-						return match[1]
-					}
-				}
+		// Check preDashFollowingInfoUrn field
+		if preDashFollowingInfoUrn, ok := obj["preDashFollowingInfoUrn"].(string); ok {
+			match := re.FindStringSubmatch(preDashFollowingInfoUrn)
+			if len(match) > 1 {
+				return match[1]
 			}
 		}
 	}

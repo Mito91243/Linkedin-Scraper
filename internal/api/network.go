@@ -2,20 +2,25 @@ package api
 
 import (
 	"fmt"
-	//"io"
+	"strings"
+
+	"main/config"
 	"main/internal/utils"
 	"net/http"
 	"os"
-	//"regexp"
-	//"strings"
+	"time"
 )
 
-func GetReq(url string, client *http.Client) ([]byte, int) {
+func GetReq(url string, app *config.Application) ([]byte, int) {
+	startTime := time.Now()
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println("❌ Error creating request:", err)
+		app.ErrorLog.Printf("Error creating request for %s: %v", url, err)
 		return nil, 0
 	}
+
+	// Headers setup (unchanged)
 	req.Header.Add("accept", "application/vnd.linkedin.normalized+json+2.1")
 	req.Header.Add("accept-encoding", "gzip, deflate, br, zstd")
 	req.Header.Add("accept-language", "en-GB,en-US;q=0.9,en;q=0.8")
@@ -33,18 +38,46 @@ func GetReq(url string, client *http.Client) ([]byte, int) {
 	req.Header.Add("x-restli-protocol-version", "2.0.0")
 	req.Header.Add("Cookie", os.Getenv("cookie"))
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-	res, err := client.Do(req)
+
+	//! Log request headers
+	/*app.InfoLog.Printf("Request Headers for %s:", url)
+	  for name, values := range req.Header {
+	      for _, value := range values {
+	          app.InfoLog.Printf("%s: %s", name, value)
+	      }
+	  }*/
+	//app.InfoLog.Printf("Now Executing %s: ", url)
+
+	res, err := app.Client.Do(req)
 	if err != nil {
-		fmt.Println("❌ Error executing request:", err)
+		app.ErrorLog.Printf("Error executing request for %s: %v", url, err)
 		return nil, 0
 	}
 	defer res.Body.Close()
 
 	body := utils.Decoding(res)
-	//fmt.Printf(string(body))
-	if res.StatusCode != 200 {
-		fmt.Printf("🌐 Connection Error With Status Code: %d\n", res.StatusCode)
+	duration := time.Since(startTime)
+	url = strings.Split(url, "&queryId")[0]
+	logMessage := fmt.Sprintf("URL: %s | Status: %d | Time: %d ms", url, res.StatusCode, duration.Milliseconds())
+
+	// If response status code is not 200 get all headers
+	if res.StatusCode != http.StatusOK {
+		app.ErrorLog.Printf("Request failed: %s", logMessage)
+
+		// Log response headers
+		app.ErrorLog.Printf("Response Headers:")
+		for name, values := range res.Header {
+			for _, value := range values {
+				app.ErrorLog.Printf("%s: %s", name, value)
+			}
+		}
+
+		// Log response body
+		//app.ErrorLog.Printf("Response Body: %s", string(body))
+	} else {
+		app.InfoLog.Printf("Request successful: %s", logMessage)
 	}
+
 	return body, res.StatusCode
 }
 
