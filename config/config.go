@@ -12,6 +12,9 @@ type Application struct {
 	InfoLog  *log.Logger
 	Client   *http.Client
 	DB       struct {
-		Dsn string
+		Dsn          string
+		MaxOpenConns int
+		MaxIdleConns int
+		MaxIdleTime  string
 	}
 }

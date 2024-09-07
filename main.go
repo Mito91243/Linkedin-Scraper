@@ -21,7 +21,9 @@ func main() {
 	//Setting Dev Mode
 	mode := flag.String("m", "prod", "Enviroment Mode")
 	dsn := flag.String("db-dsn", os.Getenv("link_db_dsn"), "PostgreSQL DSN")
-
+	maxOC := flag.Int("db-max-open-conns", 25, "PostgreSQL max open connections")
+	maxIC := flag.Int("db-max-idle-conns", 25, "PostgreSQL max idle connections")
+	maxIT := flag.String("db-max-idle-time", "15m", "PostgreSQL max connection idle time")
 	flag.Parse()
 
 	//Setting Loggers,client for the application
@@ -31,8 +33,16 @@ func main() {
 		Client: &http.Client{
 			Timeout: time.Second * 30,
 		},
-		DB: struct{ Dsn string }{
-			Dsn: *dsn,
+		DB: struct {
+			Dsn          string
+			MaxOpenConns int
+			MaxIdleConns int
+			MaxIdleTime  string
+		}{
+			Dsn:          *dsn,
+			MaxOpenConns: *maxOC,
+			MaxIdleConns: *maxIC,
+			MaxIdleTime:  *maxIT,
 		},
 	}
 
