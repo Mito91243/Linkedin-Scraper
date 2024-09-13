@@ -3,6 +3,7 @@ package config
 import (
 	//"fmt"
 	"log"
+	"main/internal/models"
 	"net/http"
 	//"runtime/debug"
 )
@@ -16,5 +17,6 @@ type Application struct {
 		MaxOpenConns int
 		MaxIdleConns int
 		MaxIdleTime  string
+		Models models.DbModels
 	}
 }

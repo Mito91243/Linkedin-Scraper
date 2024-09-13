@@ -4,15 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 	"log"
 	"main/cmd"
 	"main/config"
+	"main/internal/models"
 	"main/internal/web"
 	"net/http"
 	"os"
 	"time"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 	maxIC := flag.Int("db-max-idle-conns", 25, "PostgreSQL max idle connections")
 	maxIT := flag.String("db-max-idle-time", "15m", "PostgreSQL max connection idle time")
 	flag.Parse()
-
+	db, err := openDB()
 	//Setting Loggers,client for the application
 	app := &config.Application{
 		ErrorLog: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
@@ -38,12 +39,17 @@ func main() {
 			MaxOpenConns int
 			MaxIdleConns int
 			MaxIdleTime  string
+			Models models.DbModels
 		}{
 			Dsn:          *dsn,
 			MaxOpenConns: *maxOC,
 			MaxIdleConns: *maxIC,
 			MaxIdleTime:  *maxIT,
+			Models: models.NewModels(db),
 		},
+	}
+	if err != nil {
+		app.ErrorLog.Fatal(err)
 	}
 
 	if err != nil {
@@ -51,10 +57,7 @@ func main() {
 		return
 	}
 
-	db, err := openDB(app)
-	if err != nil {
-		app.ErrorLog.Fatal(err)
-	}
+
 	// Defer a call to db.Close() so that the connection pool is closed before the
 	// main() function exits.
 	defer db.Close()
@@ -70,10 +73,10 @@ func main() {
 	}
 }
 
-func openDB(app *config.Application) (*sql.DB, error) {
+func openDB() (*sql.DB, error) {
 	// Use sql.Open() to create an empty connection pool, using the DSN from the config
 	// struct.
-	db, err := sql.Open("postgres", app.DB.Dsn)
+	db, err := sql.Open("postgres", os.Getenv("link_db_dsn"))
 	if err != nil {
 		return nil, err
 	}
