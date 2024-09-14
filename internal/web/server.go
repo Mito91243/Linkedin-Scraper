@@ -2,19 +2,25 @@ package web
 
 import (
 	"log"
-	//"main/config"
+	"main/internal/models"
 	"net/http"
 	"os"
 	"time"
 )
 
 type Application struct {
-	ErrorLog *log.Logger
-	InfoLog  *log.Logger
-	Client   *http.Client
-	DB       struct {
-		Dsn string
-	}
+    ErrorLog *log.Logger
+    InfoLog  *log.Logger
+    Client   *http.Client
+    DB       DatabaseConfig
+}
+
+type DatabaseConfig struct {
+    Dsn          string
+    MaxOpenConns int
+    MaxIdleConns int
+    MaxIdleTime  string
+    Models       models.DbModels
 }
 
 func Start() {

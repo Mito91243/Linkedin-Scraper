@@ -17,6 +17,6 @@ type Application struct {
 		MaxOpenConns int
 		MaxIdleConns int
 		MaxIdleTime  string
-		Models models.DbModels
+		Models       models.DbModels
 	}
 }

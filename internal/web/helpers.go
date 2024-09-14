@@ -72,6 +72,7 @@ func (app *Application) getAllProfiles(position string, companyName string) []by
 		profilesExtended := app.getProfiles(companyName, urlTalentAcquisition, Ap)
 		profiles = append(profiles, profilesExtended...)
 	}
+	//app.DB.Models.Profilesdb.InsertMany()
 	jsonData, err := json.Marshal(profiles)
 	if err != nil {
 		fmt.Println("Error Marshalling to Json")

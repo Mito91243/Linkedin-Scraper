@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS profiles (
-id INTEGER PRIMARY KEY,
+id bigserial PRIMARY KEY,
 created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
 fullname text NOT NULL,
 position text NOT NULL,

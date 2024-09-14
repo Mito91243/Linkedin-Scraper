@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"log"
 	"main/cmd"
 	"main/config"
@@ -12,8 +14,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	maxIC := flag.Int("db-max-idle-conns", 25, "PostgreSQL max idle connections")
 	maxIT := flag.String("db-max-idle-time", "15m", "PostgreSQL max connection idle time")
 	flag.Parse()
-	db, err := openDB()
+	db, err2 := openDB()
 	//Setting Loggers,client for the application
 	app := &config.Application{
 		ErrorLog: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
@@ -39,16 +39,16 @@ func main() {
 			MaxOpenConns int
 			MaxIdleConns int
 			MaxIdleTime  string
-			Models models.DbModels
+			Models       models.DbModels
 		}{
 			Dsn:          *dsn,
 			MaxOpenConns: *maxOC,
 			MaxIdleConns: *maxIC,
 			MaxIdleTime:  *maxIT,
-			Models: models.NewModels(db),
+			Models:       models.NewModels(db),
 		},
 	}
-	if err != nil {
+	if err2 != nil {
 		app.ErrorLog.Fatal(err)
 	}
 
@@ -56,7 +56,6 @@ func main() {
 		app.ErrorLog.Printf("Error Loading .env")
 		return
 	}
-
 
 	// Defer a call to db.Close() so that the connection pool is closed before the
 	// main() function exits.

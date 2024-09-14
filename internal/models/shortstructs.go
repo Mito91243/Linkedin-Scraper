@@ -1,13 +1,17 @@
 package models
 
-type ProfileRes struct {
-	FullName   string `json:"fullName"`
-	LastName   string `json:"lastName"`
-	Position   string `json:"position"`
-	ProfileURN string `json:"Email"`
-	Link       string `json:"Link"`
-}
+import "time"
 
+type ProfileRes struct {
+	FullName   string    `json:"fullName"`
+	LastName   string    `json:"lastName"`
+	Position   string    `json:"position"`
+	ProfileURN string    `json:"Email"`
+	Link       string    `json:"Link"`
+	ID         int64     `json:"-"`
+	CreatedAt  time.Time `json:"-"`
+	Version    int       `json:"-"`
+}
 type PostRes struct {
 	Text         string `json:"text"`
 	Name         string `json:"name"`
