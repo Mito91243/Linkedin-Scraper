@@ -9,18 +9,18 @@ import (
 )
 
 type Application struct {
-    ErrorLog *log.Logger
-    InfoLog  *log.Logger
-    Client   *http.Client
-    DB       DatabaseConfig
+	ErrorLog *log.Logger
+	InfoLog  *log.Logger
+	Client   *http.Client
+	DB       DatabaseConfig
 }
 
 type DatabaseConfig struct {
-    Dsn          string
-    MaxOpenConns int
-    MaxIdleConns int
-    MaxIdleTime  string
-    Models       models.DbModels
+	Dsn          string
+	MaxOpenConns int
+	MaxIdleConns int
+	MaxIdleTime  string
+	Models       models.DbModels
 }
 
 func Start() {
