@@ -62,7 +62,7 @@ func InitializeConfig() *Application {
 		app.ErrorLog.Printf("Error Loading .env")
 		return nil
 	}
-	
+
 	db, err := openDB()
 
 	if err != nil {

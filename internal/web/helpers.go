@@ -14,7 +14,7 @@ import (
 
 // The serverError helper writes an error message and stack trace to the errorLog,
 // then sends a generic 500 Internal Server Error response to the user.
-func (app *Application) serverError(w http.ResponseWriter, err error) {
+func  serverError(app *config.Application,w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	app.ErrorLog.Print(trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -23,18 +23,18 @@ func (app *Application) serverError(w http.ResponseWriter, err error) {
 // The clientError helper sends a specific status code and corresponding description
 // to the user. We'll use this later in the book to send responses like 400 "Bad
 // Request" when there's a problem with the request that the user sent.
-func (app *Application) clientError(w http.ResponseWriter, status int) {
+func  clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
 // For consistency, we'll also implement a notFound helper. This is simply a
 // convenience wrapper around clientError which sends a 404 Not Found response to
 // the user.
-func (app *Application) notFound(w http.ResponseWriter) {
-	app.clientError(w, http.StatusNotFound)
+func notFound(w http.ResponseWriter) {
+	clientError(w, http.StatusNotFound)
 }
 
-func (app *Application) getAllProfiles(position string, companyName string) []byte {
+func getAllProfiles(position string, companyName string, app *config.Application) []byte {
 	Ap := &config.Application{
 		InfoLog:  app.InfoLog,
 		ErrorLog: app.ErrorLog,
@@ -58,10 +58,10 @@ func (app *Application) getAllProfiles(position string, companyName string) []by
 	SecondPatch := make(chan []models.ProfileRes)
 
 	go func() {
-		firstPatch <- app.getProfiles(companyName, url, Ap)
+		firstPatch <- getProfiles(companyName, url, app)
 	}()
 	go func() {
-		SecondPatch <- app.getProfiles(companyName, url2, Ap)
+		SecondPatch <- getProfiles(companyName, url2, app)
 	}()
 	profiles := <-firstPatch
 	profiles2 := <-SecondPatch
@@ -69,7 +69,7 @@ func (app *Application) getAllProfiles(position string, companyName string) []by
 
 	// Get Talent Acquisition personnel
 	if position == "12" {
-		profilesExtended := app.getProfiles(companyName, urlTalentAcquisition, Ap)
+		profilesExtended := getProfiles(companyName, urlTalentAcquisition, Ap)
 		profiles = append(profiles, profilesExtended...)
 	}
 	//app.DB.Models.Profilesdb.InsertMany()
@@ -82,9 +82,9 @@ func (app *Application) getAllProfiles(position string, companyName string) []by
 	return jsonData
 }
 
-func (app *Application) getProfiles(companyName string, url string, Ap *config.Application) []models.ProfileRes {
+func  getProfiles(companyName string, url string, app *config.Application) []models.ProfileRes {
 
-	body, status := api.GetReq(url, Ap)
+	body, status := api.GetReq(url, app)
 
 	if status != 200 {
 		app.ErrorLog.Printf("Error Getting Profiles: %v", status)

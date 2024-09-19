@@ -1,42 +1,17 @@
 package web
 
 import (
-	"log"
-	"main/internal/models"
+	"main/config"
 	"net/http"
-	"os"
-	"time"
 )
 
-type Application struct {
-	ErrorLog *log.Logger
-	InfoLog  *log.Logger
-	Client   *http.Client
-	DB       DatabaseConfig
-}
 
-type DatabaseConfig struct {
-	Dsn          string
-	MaxOpenConns int
-	MaxIdleConns int
-	MaxIdleTime  string
-	Models       models.DbModels
-}
-
-func Start() {
-	//Setting Loggers,client for the application
-	app := &Application{
-		ErrorLog: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
-		InfoLog:  log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
-		Client: &http.Client{
-			Timeout: time.Second * 30,
-		},
-	}
+func Start(app *config.Application) {
 
 	srv := &http.Server{
 		Addr:     ":80",
 		ErrorLog: app.ErrorLog,
-		Handler:  app.routes(),
+		Handler:  routes(app),
 	}
 
 	app.InfoLog.Printf("Starting server on 4040")
@@ -44,11 +19,11 @@ func Start() {
 	app.ErrorLog.Fatal(err)
 }
 
-func (app *Application) routes() http.Handler {
+func routes(app *config.Application) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.Home())
-	mux.HandleFunc("/post/viewall", app.Postsviewall())
-	mux.HandleFunc("/profiles/view", app.Profilesviewall())
+	mux.HandleFunc("/", Home(app))
+	mux.HandleFunc("/post/viewall", Postsviewall())
+	mux.HandleFunc("/profiles/view", Profilesviewall(app))
 	//log.Print(starting)
-	return app.RecoverPanic(app.MWlogRequest(app.MWsecureHeaders(mux)))
+	return RecoverPanic(app)(MWlogRequest(app)(MWsecureHeaders(app)(mux)))
 }

@@ -10,7 +10,7 @@ import (
 func main() {
 	app := config.InitializeConfig()
 	if app.Mode == "prod" {
-		web.Start()
+		web.Start(app)
 	} else {
 		cmd.Start(app)
 	}
