@@ -2,18 +2,19 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"main/config"
 	"main/internal/api"
 	"main/internal/models"
 	"main/internal/utils"
 	"strings"
 	"time"
+	"github.com/fatih/color"
 )
+
+
 
 func Start(app *config.Application) {
 	PrintHeader()
-
 	companyName := Read_input()
 	start := time.Now()
 	companyIdchan := make(chan string)
