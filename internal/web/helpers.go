@@ -35,15 +35,10 @@ func notFound(w http.ResponseWriter) {
 }
 
 func getAllProfiles(position string, companyName string, app *config.Application) []byte {
-	Ap := &config.Application{
-		InfoLog:  app.InfoLog,
-		ErrorLog: app.ErrorLog,
-		Client:   app.Client,
-	}
 
-	CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:RICH_QUERY_TYPEAHEAD_HISTORY,query:(keywords:" + companyName + ",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:heroEntityKey,value:List(urn%3Ali%3Aorganization%3A18057791)),(key:position,value:List(0)),(key:resultType,value:List(ALL)),(key:searchId,value:List(7f9942a4-3ddc-46ad-8d2e-e134c5d766e7)),(key:spellCorrectionEnabled,value:List(true))),includeFiltersInResponse:false,spellCorrectionEnabled:true,clientSearchId:8c0cd58c-c063-4477-9491-f25888b7987c))&queryId=voyagerSearchDashClusters.b67807cb32b49b40ee7d5f5e2310d071"
+	CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:TYPEAHEAD_ESCAPE_HATCH,query:(keywords:"+companyName+",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:resultType,value:List(ALL))),includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters.dec2e0cf0d4c89523266f6e3b44cc87c"
 
-	body, status := api.GetReq(CompanyURL, Ap)
+	body, status := api.GetReq(CompanyURL, app)
 	if status != 200 {
 		app.ErrorLog.Printf("Error Fetching Company URL: %v", status)
 	}
@@ -69,7 +64,7 @@ func getAllProfiles(position string, companyName string, app *config.Application
 
 	// Get Talent Acquisition personnel
 	if position == "12" {
-		profilesExtended := getProfiles(companyName, urlTalentAcquisition, Ap)
+		profilesExtended := getProfiles(companyName, urlTalentAcquisition, app)
 		profiles = append(profiles, profilesExtended...)
 	}
 	//app.DB.Models.Profilesdb.InsertMany()
@@ -152,3 +147,9 @@ func GetPosts(urls []string, app *config.Application) []models.PostRes {
 	}
 	return posts
 }*/
+
+
+
+
+//https://www.linkedin.com/voyager/api/graphql?variables=(query:paymob)&queryId=voyagerSearchDashTypeahead.d51ffbb93e101b83c05ba0734bc4f380
+//https://www.linkedin.com/voyager/api/graphql?variables=(query:fawry)&queryId=voyagerSearchDashTypeahead.d51ffbb93e101b83c05ba0734bc4f380
