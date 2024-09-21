@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-func  MWsecureHeaders(app *config.Application) func (http.Handler) http.Handler {
+func MWsecureHeaders(app *config.Application) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Note: This is split across multiple lines for readability. You don't
@@ -20,20 +20,20 @@ func  MWsecureHeaders(app *config.Application) func (http.Handler) http.Handler 
 			w.Header().Set("X-Frame-Options", "deny")
 			w.Header().Set("X-XSS-Protection", "0")
 			next.ServeHTTP(w, r)
-		})	
+		})
 	}
 }
 
 func MWlogRequest(app *config.Application) func(http.Handler) http.Handler {
-    return func(next http.Handler) http.Handler {
-        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-            app.InfoLog.Printf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL.RequestURI())
-            next.ServeHTTP(w, r)
-        })
-    }
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			app.InfoLog.Printf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL.RequestURI())
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
-func RecoverPanic(app *config.Application) func (http.Handler) http.Handler {
+func RecoverPanic(app *config.Application) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Create a deferred function (which will always be run in the event
@@ -46,10 +46,10 @@ func RecoverPanic(app *config.Application) func (http.Handler) http.Handler {
 					w.Header().Set("Connection", "close")
 					// Call the app.serverError helper method to return a 500
 					// Internal Server response.
-					serverError(app,w, fmt.Errorf("%s", err))
+					serverError(app, w, fmt.Errorf("%s", err))
 				}
 			}()
 			next.ServeHTTP(w, r)
-		})	
+		})
 	}
 }

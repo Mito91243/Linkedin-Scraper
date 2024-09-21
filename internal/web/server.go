@@ -5,7 +5,6 @@ import (
 	"net/http"
 )
 
-
 func Start(app *config.Application) {
 
 	srv := &http.Server{
@@ -22,7 +21,7 @@ func Start(app *config.Application) {
 func routes(app *config.Application) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", Home(app))
-	mux.HandleFunc("/post/viewall", Postsviewall())
+	mux.HandleFunc("/posts/viewall", Postsviewall(app))
 	mux.HandleFunc("/profiles/view", Profilesviewall(app))
 	//log.Print(starting)
 	return RecoverPanic(app)(MWlogRequest(app)(MWsecureHeaders(app)(mux)))

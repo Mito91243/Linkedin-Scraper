@@ -5,17 +5,17 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"github.com/joho/godotenv"
 	"log"
 	"main/internal/models"
 	"net/http"
 	"os"
 	"time"
-	"github.com/joho/godotenv"
 	//"runtime/debug"
 )
 
 type Application struct {
-	Mode string
+	Mode     string
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	Client   *http.Client
@@ -49,7 +49,7 @@ func InitializeConfig() *Application {
 	}
 
 	app := &Application{
-		Mode: *mode,
+		Mode:     *mode,
 		ErrorLog: log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
 		InfoLog:  log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
 		Client: &http.Client{
@@ -68,8 +68,6 @@ func InitializeConfig() *Application {
 	if err != nil {
 		app.ErrorLog.Fatal(err)
 	}
-
-
 
 	// Defer a call to db.Close() so that the connection pool is closed before the
 	// main() function exits.

@@ -8,20 +8,29 @@ const categories = [
   { id: 13, name: 'IT Personnel' },
 ];
 
-function SearchForm({ onSearch }) {
+function SearchForm({ onSearch, onGetPosts }) {
   const [companyName, setCompanyName] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [keyword, setKeyword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (companyName && categoryId) {
-      onSearch(companyName, parseInt(categoryId, 10));
+      onSearch(companyName, parseInt(categoryId, 10), keyword);
+    }
+  };
+
+  const handleGetPosts = () => {
+    if (companyName && categoryId && keyword) {
+      onGetPosts(keyword, companyName, parseInt(categoryId, 10));
+    } else {
+      alert("Please fill in all fields (company, category, and keyword) before getting posts.");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="mb-4">
-      <div className="flex flex-col md:flex-row gap-2">
+      <div className="flex flex-col md:flex-row gap-2 mb-4">
         <input
           type="text"
           value={companyName}
@@ -43,16 +52,26 @@ function SearchForm({ onSearch }) {
             </option>
           ))}
         </select>
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          placeholder="Enter keyword"
+          className="border p-2 rounded"
+        />
+      </div>
+      <div className="flex flex-col md:flex-row gap-2">
         <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-          Search
+          Search Profiles
         </button>
         <button 
-          className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+          type="button"
+          onClick={handleGetPosts}
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
         >
           Get Posts
         </button>
       </div>
-      
     </form>
   );
 }

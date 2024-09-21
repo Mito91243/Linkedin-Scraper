@@ -14,7 +14,7 @@ import (
 
 // The serverError helper writes an error message and stack trace to the errorLog,
 // then sends a generic 500 Internal Server Error response to the user.
-func  serverError(app *config.Application,w http.ResponseWriter, err error) {
+func serverError(app *config.Application, w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	app.ErrorLog.Print(trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -23,7 +23,7 @@ func  serverError(app *config.Application,w http.ResponseWriter, err error) {
 // The clientError helper sends a specific status code and corresponding description
 // to the user. We'll use this later in the book to send responses like 400 "Bad
 // Request" when there's a problem with the request that the user sent.
-func  clientError(w http.ResponseWriter, status int) {
+func clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
@@ -36,7 +36,7 @@ func notFound(w http.ResponseWriter) {
 
 func getAllProfiles(position string, companyName string, app *config.Application) []byte {
 
-	CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:TYPEAHEAD_ESCAPE_HATCH,query:(keywords:"+companyName+",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:resultType,value:List(ALL))),includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters.dec2e0cf0d4c89523266f6e3b44cc87c"
+	CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:TYPEAHEAD_ESCAPE_HATCH,query:(keywords:" + companyName + ",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:resultType,value:List(ALL))),includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters.dec2e0cf0d4c89523266f6e3b44cc87c"
 
 	body, status := api.GetReq(CompanyURL, app)
 	if status != 200 {
@@ -77,7 +77,7 @@ func getAllProfiles(position string, companyName string, app *config.Application
 	return jsonData
 }
 
-func  getProfiles(companyName string, url string, app *config.Application) []models.ProfileRes {
+func getProfiles(companyName string, url string, app *config.Application) []models.ProfileRes {
 
 	body, status := api.GetReq(url, app)
 
@@ -119,16 +119,24 @@ func  getProfiles(companyName string, url string, app *config.Application) []mod
 	return profiles
 }
 
-/*func getAllPosts(profiles []models.ProfileRes, keyword string, app *config.Application) {
+//! I am getting JsonData from getallprofiles need to unmarshal or modify to marshal on the request handler
+func getAllPosts(profiles []models.ProfileRes,keyword string, app *config.Application) []byte {
 	posturls := []string{}
 
 	utils.GetPostQuery(profiles, keyword, &posturls)
 	if len(posturls) < 1 {
-		fmt.Print("DIDNT PARSE ANY")
-		return
+		app.ErrorLog.Printf("Couldn't Parse")
+		return nil
 	}
 	posts := GetPosts(posturls, app)
-	utils.DisplayPosts(posts)
+	jsonData, err := json.Marshal(posts)
+	if err != nil {
+		fmt.Println("Error Marshalling to Json")
+	}
+	app.InfoLog.Printf("Profile Fetched :  %d", len(profiles))
+
+	return jsonData
+
 }
 
 func GetPosts(urls []string, app *config.Application) []models.PostRes {
@@ -146,10 +154,7 @@ func GetPosts(urls []string, app *config.Application) []models.PostRes {
 		posts = append(posts, results...)
 	}
 	return posts
-}*/
-
-
-
+}
 
 //https://www.linkedin.com/voyager/api/graphql?variables=(query:paymob)&queryId=voyagerSearchDashTypeahead.d51ffbb93e101b83c05ba0734bc4f380
 //https://www.linkedin.com/voyager/api/graphql?variables=(query:fawry)&queryId=voyagerSearchDashTypeahead.d51ffbb93e101b83c05ba0734bc4f380
