@@ -9,6 +9,7 @@ import (
 	"main/internal/utils"
 	"net/http"
 	"runtime/debug"
+	"strconv"
 	"strings"
 )
 
@@ -34,7 +35,7 @@ func notFound(w http.ResponseWriter) {
 	clientError(w, http.StatusNotFound)
 }
 
-func getAllProfiles(position string, companyName string, app *config.Application) []byte {
+func getAllProfiles(position string, companyName string, app *config.Application) []models.ProfileRes {
 
 	CompanyURL := "https://www.linkedin.com/voyager/api/graphql?variables=(start:0,origin:TYPEAHEAD_ESCAPE_HATCH,query:(keywords:" + companyName + ",flagshipSearchIntent:SEARCH_SRP,queryParameters:List((key:resultType,value:List(ALL))),includeFiltersInResponse:false))&queryId=voyagerSearchDashClusters.dec2e0cf0d4c89523266f6e3b44cc87c"
 
@@ -67,14 +68,12 @@ func getAllProfiles(position string, companyName string, app *config.Application
 		profilesExtended := getProfiles(companyName, urlTalentAcquisition, app)
 		profiles = append(profiles, profilesExtended...)
 	}
-	//app.DB.Models.Profilesdb.InsertMany()
-	jsonData, err := json.Marshal(profiles)
-	if err != nil {
-		fmt.Println("Error Marshalling to Json")
-	}
-	app.InfoLog.Printf("Profile Fetched :  %d", len(profiles))
+	for i := range profiles {
+        profiles[i].CompanyID,_ = strconv.Atoi(id)
+        profiles[i].Category,_= strconv.Atoi(position)
+    }
+	return profiles
 
-	return jsonData
 }
 
 func getProfiles(companyName string, url string, app *config.Application) []models.ProfileRes {
@@ -119,8 +118,8 @@ func getProfiles(companyName string, url string, app *config.Application) []mode
 	return profiles
 }
 
-//! I am getting JsonData from getallprofiles need to unmarshal or modify to marshal on the request handler
-func getAllPosts(profiles []models.ProfileRes,keyword string, app *config.Application) []byte {
+// ! I am getting JsonData from getallprofiles need to unmarshal or modify to marshal on the request handler
+func getAllPosts(profiles []models.ProfileRes, keyword string, app *config.Application) []byte {
 	posturls := []string{}
 
 	utils.GetPostQuery(profiles, keyword, &posturls)

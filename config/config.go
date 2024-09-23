@@ -5,12 +5,14 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"github.com/joho/godotenv"
 	"log"
-	"main/internal/models"
+	"main/internal/data"
+	//"main/internal/models"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 	//"runtime/debug"
 )
 
@@ -27,7 +29,7 @@ type DBconfig struct {
 	MaxOC  int
 	MaxIC  int
 	MaxIT  string
-	Models models.DbModels
+	Models data.DbModels
 }
 
 func InitializeConfig() *Application {
@@ -64,14 +66,13 @@ func InitializeConfig() *Application {
 	}
 
 	db, err := openDB()
-
 	if err != nil {
-		app.ErrorLog.Fatal(err)
-	}
+        app.ErrorLog.Fatal(err)
+    }
+	app.DB.Models = data.NewModels(db)
 
 	// Defer a call to db.Close() so that the connection pool is closed before the
 	// main() function exits.
-	defer db.Close()
 	// Also log a message to say that the connection pool has been successfully
 	// established.
 	app.InfoLog.Printf("database connection pool established")

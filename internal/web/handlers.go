@@ -3,7 +3,7 @@ package web
 import (
 	"encoding/json"
 	"main/config"
-	"main/internal/models"
+	//"main/internal/models"
 	"net/http"
 )
 
@@ -26,14 +26,9 @@ func Postsviewall(app *config.Application) http.HandlerFunc {
 		company := r.URL.Query().Get("company")
 		category := r.URL.Query().Get("category")
 		keyword := r.URL.Query().Get("keyword")
-		profilesjson := getAllProfiles(category, company, app)
-		var profiles []models.ProfileRes
+		profiles := getAllProfiles(category, company, app)
 
-		err2 := json.Unmarshal(profilesjson, &profiles)
-		if err2 != nil {
-			app.ErrorLog.Fatalf("Error unmarshalling profiles: %v", err2)
-		}
-		jsonData := getAllPosts(profiles,keyword, app)
+		jsonData := getAllPosts(profiles, keyword, app)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write(jsonData)
@@ -51,14 +46,23 @@ func Postsviewall(app *config.Application) http.HandlerFunc {
 func Profilesviewall(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*") // In production, set this to your frontend's origin
-		//start := time.Now()
 		company := r.URL.Query().Get("company")
 		category := r.URL.Query().Get("category")
-		jsonData := getAllProfiles(category, company, app)
+		profiles := getAllProfiles(category, company, app)
+		app.ErrorLog.Printf("%v\n",app.DB.MaxOC)
+		err := app.DB.Models.Profilesdb.InsertManyProfiles(profiles)
+		if err != nil {
+			app.ErrorLog.Fatal(err)
+		}
+		jsonData, err := json.Marshal(profiles)
+		if err != nil {
+			app.ErrorLog.Println("Error Marshalling to Json")
+		}
+		app.InfoLog.Printf("Profile Fetched :  %d", len(profiles))
 		w.Header().Set("Content-Type", "application/json")
 
 		w.WriteHeader(http.StatusOK)
-		_, err := w.Write(jsonData)
+		_, err = w.Write(jsonData)
 		if err != nil {
 			// Log the error
 			app.ErrorLog.Printf("Error writing response: %v", err)

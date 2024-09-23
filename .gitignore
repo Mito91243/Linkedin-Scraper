@@ -3,3 +3,6 @@
 
 #Current Build
 main.exe
+
+#DB migrations
+migrations
